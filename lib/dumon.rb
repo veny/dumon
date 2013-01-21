@@ -9,13 +9,14 @@ require 'dumon/version'
 # This module represents the entry point of Dumon tool.
 module Dumon
 
-  #autoload :Utils,          'orientdb4r/utils'
+  autoload :Xrandr,          'dumon/screen'
+  autoload :Tray,            'dumon/ui'
 
 
   class << self
 
     ###
-    # Logger used for logging output
+    # Logger used for logging output.
     attr_accessor :logger
 
   end
@@ -43,3 +44,11 @@ Dumon::logger.info \
 
 
 #Dumon::logger.level = Logger::DEBUG
+screen = Dumon::Xrandr.new
+screen.assert_stool
+Dumon::logger.info "Outputs found: #{screen.outputs}"
+
+Gtk.init
+ui = Dumon::Tray.new
+ui.screen = screen
+Gtk.main
