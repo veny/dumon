@@ -10,8 +10,8 @@ module Dumon
     attr_accessor :stool
 
     ###
-    # Asserts whether the sub-class can find a concrete system tool.
-    def assert_stool
+    # Reads info about current accessible outputs and their settings.
+    def read
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
@@ -25,7 +25,10 @@ module Dumon
 
   class Xrandr < Screen
 
-    def assert_stool #:nodoc:
+    ###
+    # Constructor.
+    # Checks whether the 'xrandr' system tool is there.
+    def initialize
       paths = ['xrandr', '/usr/bin/xrandr']
       paths.each do |path|
         begin

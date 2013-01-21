@@ -21,17 +21,6 @@ module Dumon
 
   end
 
-
-  ###
-  # Basic error that indicates an unexpected situation during the client call.
-#  class OrientdbError < StandardError
-#    include ChainedError
-#  end
-
-  ###
-  # Error indicating that access to the resource requires user authentication.
-#  class UnauthorizedError < OrientdbError; end
-
 end
 
 
@@ -43,12 +32,10 @@ Dumon::logger.info \
     "Dumon #{Dumon::VERSION}, running on Ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]"
 
 
-#Dumon::logger.level = Logger::DEBUG
+# start the app
 screen = Dumon::Xrandr.new
-screen.assert_stool
 Dumon::logger.info "Outputs found: #{screen.outputs}"
 
-Gtk.init
 ui = Dumon::Tray.new
 ui.screen = screen
-Gtk.main
+ui.render
