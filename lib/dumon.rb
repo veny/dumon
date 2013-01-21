@@ -12,7 +12,6 @@ module Dumon
   autoload :Xrandr,          'dumon/screen'
   autoload :Tray,            'dumon/ui'
 
-
   class << self
 
     ###
