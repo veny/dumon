@@ -54,6 +54,8 @@ module Dumon
     def initialize #:nodoc:
       super
 
+      @selected_resolution = {}
+
       @tray = Gtk::StatusIcon.new
       @tray.visible = true
       @tray.pixbuf = Gdk::Pixbuf.new(::File.join(::File.dirname(__FILE__), '..', '..', 'img', 'monitor.png'))
@@ -68,18 +70,32 @@ module Dumon
 
 
       def create_menu
-        rslt = Gtk::Menu.new
         outputs = self.screen.read
+
+        rslt = Gtk::Menu.new
 
         # resolutions
         outputs.keys.each do |o|
           item = Gtk::MenuItem.new(o)
           submenu = Gtk::Menu.new
-          outputs[o].each do |res|
-            si = Gtk::MenuItem.new(res)
+          item.set_submenu(submenu)
+
+          defres = self.screen.default_resolution(o)
+
+          radios = []
+          outputs[o][:resolutions].each do |res|
+            si = Gtk::RadioMenuItem.new(radios, defres === res ? "#{res} *" : res)
+            si.active = (@selected_resolution[o] === res or (@selected_resolution[o].nil? and outputs[o][:current] === res))
+            #si.image = Gtk::Image.new(Gtk::Stock::YES, Gtk::IconSize::MENU)
+            radios << si
+            si.signal_connect('activate') do
+              if si.active?
+                @selected_resolution[o] = res
+                puts "S #{@selected_resolution}"
+              end
+            end
             submenu.append(si)
           end
-          item.set_submenu(submenu)
           rslt.append(item)
         end
 
@@ -90,9 +106,9 @@ module Dumon
         # outputs
         outputs.keys.each do |o|
           item = Gtk::MenuItem.new(o)
-          defres = self.default_resolution(outputs[o])
           item.signal_connect('activate') do
-            self.screen.switch(o, defres)
+            self.screen.switch(o, @selected_resolution[o])
+            @selected_resolution.clear
           end
           rslt.append(item)
         end
@@ -106,11 +122,6 @@ module Dumon
         rslt.append(item)
 
         rslt
-      end
-
-      def default_resolution(output)
-        output.each { |res| return res[0..-2] if res.end_with?('*') }
-        raise 'no default resolution found'
       end
 
   end

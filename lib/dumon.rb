@@ -26,6 +26,7 @@ end
 # Configuration of logging.
 Dumon::logger = Logger.new(STDOUT)
 Dumon::logger.level = Logger::INFO
+Dumon::logger.level = Logger::DEBUG
 
 Dumon::logger.info \
     "Dumon #{Dumon::VERSION}, running on Ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]"
@@ -33,7 +34,6 @@ Dumon::logger.info \
 
 # start the app
 screen = Dumon::Xrandr.new
-Dumon::logger.info "Outputs found: #{screen.read}"
 
 ui = Dumon::Tray.new
 ui.screen = screen
