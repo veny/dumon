@@ -71,6 +71,22 @@ module Dumon
         rslt = Gtk::Menu.new
         outputs = self.screen.read
 
+        # resolutions
+        outputs.keys.each do |o|
+          item = Gtk::MenuItem.new(o)
+          submenu = Gtk::Menu.new
+          outputs[o].each do |res|
+            si = Gtk::MenuItem.new(res)
+            submenu.append(si)
+          end
+          item.set_submenu(submenu)
+          rslt.append(item)
+        end
+
+        # separator
+        item = Gtk::SeparatorMenuItem.new
+        rslt.append(item)
+
         # outputs
         outputs.keys.each do |o|
           item = Gtk::MenuItem.new(o)
