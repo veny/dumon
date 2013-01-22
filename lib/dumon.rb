@@ -33,7 +33,7 @@ Dumon::logger.info \
 
 # start the app
 screen = Dumon::Xrandr.new
-Dumon::logger.info "Outputs found: #{screen.outputs}"
+Dumon::logger.info "Outputs found: #{screen.read}"
 
 ui = Dumon::Tray.new
 ui.screen = screen

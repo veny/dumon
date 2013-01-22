@@ -69,11 +69,15 @@ module Dumon
 
       def create_menu
         rslt = Gtk::Menu.new
+        outputs = self.screen.read
 
         # outputs
-        self.screen.outputs.each do |o|
+        outputs.keys.each do |o|
           item = Gtk::MenuItem.new(o)
-          item.signal_connect('activate') { puts o }
+          defres = self.default_resolution(outputs[o])
+          item.signal_connect('activate') do
+            self.screen.switch(o, defres)
+          end
           rslt.append(item)
         end
 
@@ -86,6 +90,11 @@ module Dumon
         rslt.append(item)
 
         rslt
+      end
+
+      def default_resolution(output)
+        output.each { |res| return res[0..-2] if res.end_with?('*') }
+        raise 'no default resolution found'
       end
 
   end
