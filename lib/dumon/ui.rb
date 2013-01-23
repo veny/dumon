@@ -4,6 +4,8 @@ module Dumon
   # This class represents Dumon's user interface.
   class Ui
 
+    ###
+    # Output manager used to manipulate the outputs.
     attr_accessor :screen
 
     ###
@@ -91,7 +93,6 @@ module Dumon
             si.signal_connect('activate') do
               if si.active?
                 @selected_resolution[o] = res
-                puts "S #{@selected_resolution}"
               end
             end
             submenu.append(si)
@@ -105,7 +106,7 @@ module Dumon
 
         # outputs
         outputs.keys.each do |o|
-          item = Gtk::MenuItem.new(o)
+          item = Gtk::MenuItem.new("only #{o}")
           item.signal_connect('activate') do
             self.screen.switch(o, @selected_resolution[o])
             @selected_resolution.clear

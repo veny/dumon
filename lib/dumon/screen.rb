@@ -1,8 +1,8 @@
 module Dumon
 
   ###
-  # This class represents an abstract pattern how concrete classes providing info
-  # about outputs available on your system look like.
+  # This class represents an abstract pattern how concrete classes provide info
+  # about outputs available on your system.
   class Screen
 
     ###
@@ -16,7 +16,6 @@ module Dumon
     #   "LVDS1"=>{:resolutions=>["1600x900", "1024x768"], :default=>"1600x900"},
     #   "VGA1" =>{:resolutions=>["1920x1080", "720x400"], :default=>"1920x1080", :current=>"1920x1080"}
     #         }
-    # Notice: resolution marked by '*' suffix is native resolution of the device.
     attr_accessor :outputs
 
     ###
@@ -43,6 +42,9 @@ module Dumon
 
   end
 
+
+  ###
+  # This class manages outputs via *xrandr* system tool.
   class Xrandr < Screen
 
     ###
