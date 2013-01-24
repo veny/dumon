@@ -31,6 +31,12 @@ module Dumon
     end
 
     ###
+    # Mirrors output on all monitors with given resolution.
+    def mirror(resolution)
+      raise NotImplementedError, 'this should be overridden by concrete sub-class'
+    end
+
+    ###
     # Gets default resolution of given output.
     def default_resolution(output)
       raise 'no outputs' if self.outputs.nil? or self.outputs.empty?
@@ -38,6 +44,23 @@ module Dumon
       raise "no default resolution, output: #{output}" unless self.outputs[output].keys.include?(:default)
 
       self.outputs[output][:default]
+    end
+
+    ###
+    # Gets list of common resolutions of all outputs
+    def common_resolutions
+      raise 'no outputs' if self.outputs.nil? or self.outputs.empty?
+
+      rslt = []
+      o1 = self.outputs.keys.first
+      self.outputs[o1][:resolutions].each do |res|
+        self.outputs.keys.each do |o|
+          next if o === o1
+          rslt << res if self.outputs[o][:resolutions].include?(res)
+        end
+      end
+
+      rslt
     end
 
   end
@@ -87,18 +110,29 @@ module Dumon
 
       Dumon::logger.debug "Outputs found: #{rslt}"
       self.outputs = rslt
+      rslt
     end
 
     def switch(output, resolution, type=nil) #:nodoc:
-      outputs = self.read
-      raise "uknown output: #{output}" unless outputs.keys.include?(output)
+      self.read if self.outputs.nil? or self.outputs.empty?
+      raise "uknown output: #{output}" unless self.outputs.keys.include?(output)
 
       resolution = self.default_resolution(output) if resolution.nil?
 
       cmd = "#{self.stool} --output #{output} --mode #{resolution} --pos 0x0"
-      outputs.keys.each do |o|
+      self.outputs.keys.each do |o|
         cmd << " --output #{o} --off" unless o === output
       end
+
+      Dumon::logger.debug "Command: #{cmd}"
+      `#{cmd}`
+    end
+
+    def mirror(resolution) #:nodoc:
+      self.read if self.outputs.nil? or self.outputs.empty?
+
+      cmd = "#{self.stool}"
+      self.outputs.keys.each { |o| cmd << " --output #{o} --mode #{resolution}" }
 
       Dumon::logger.debug "Command: #{cmd}"
       `#{cmd}`

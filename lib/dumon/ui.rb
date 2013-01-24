@@ -119,6 +119,18 @@ module Dumon
         rslt.append(item)
       end
 
+      # mirror
+      item = Gtk::MenuItem.new('mirror')
+      submenu = Gtk::Menu.new
+      item.set_submenu(submenu)
+
+      self.screen.common_resolutions.each do |res|
+        si = Gtk::MenuItem.new(res)
+        si.signal_connect('activate') { self.screen.mirror(res) }
+        submenu.append(si)
+      end
+      rslt.append(item)
+
       # separator
       item = Gtk::SeparatorMenuItem.new
       rslt.append(item)
