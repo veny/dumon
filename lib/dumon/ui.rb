@@ -56,6 +56,8 @@ module Dumon
     def initialize #:nodoc:
       super
 
+      # storage of preferred resolution for next rendering (will be cleared by output changing)
+      # {"LVDS1" => "1600x900", "VGA1" => "800x600"}
       @selected_resolution = {}
 
       @tray = Gtk::StatusIcon.new
@@ -70,60 +72,63 @@ module Dumon
       end
     end
 
+    ###
+    # Reads info about currently usable outputs and construct corresponding structure of context menu.
+    def create_menu
+      outputs = self.screen.read
 
-      def create_menu
-        outputs = self.screen.read
+      rslt = Gtk::Menu.new
 
-        rslt = Gtk::Menu.new
+      # resolutions (submenu)
+      outputs.keys.each do |o|
+        item = Gtk::MenuItem.new(o)
+        submenu = Gtk::Menu.new
+        item.set_submenu(submenu)
 
-        # resolutions
-        outputs.keys.each do |o|
-          item = Gtk::MenuItem.new(o)
-          submenu = Gtk::Menu.new
-          item.set_submenu(submenu)
+        # to be marked with '*'
+        defres = self.screen.default_resolution(o)
 
-          defres = self.screen.default_resolution(o)
+        # radio buttons group
+        radios = []
 
-          radios = []
-          outputs[o][:resolutions].each do |res|
-            si = Gtk::RadioMenuItem.new(radios, defres === res ? "#{res} *" : res)
-            si.active = (@selected_resolution[o] === res or (@selected_resolution[o].nil? and outputs[o][:current] === res))
-            #si.image = Gtk::Image.new(Gtk::Stock::YES, Gtk::IconSize::MENU)
-            radios << si
-            si.signal_connect('activate') do
-              if si.active?
-                @selected_resolution[o] = res
-              end
-            end
-            submenu.append(si)
+        outputs[o][:resolutions].each do |res|
+          si = Gtk::RadioMenuItem.new(radios, defres === res ? "#{res} *" : res)
+          si.active = (@selected_resolution[o] === res or (@selected_resolution[o].nil? and outputs[o][:current] === res))
+          radios << si
+          si.signal_connect('activate') do
+            # only store your preferred resolution for next rendering
+            @selected_resolution[o] = res if si.active? # only activation, ignore deactivation
           end
-          rslt.append(item)
+          submenu.append(si)
         end
-
-        # separator
-        item = Gtk::SeparatorMenuItem.new
         rslt.append(item)
-
-        # outputs
-        outputs.keys.each do |o|
-          item = Gtk::MenuItem.new("only #{o}")
-          item.signal_connect('activate') do
-            self.screen.switch(o, @selected_resolution[o])
-            @selected_resolution.clear
-          end
-          rslt.append(item)
-        end
-
-        # separator
-        item = Gtk::SeparatorMenuItem.new
-        rslt.append(item)
-        # Quit
-        item = Gtk::ImageMenuItem.new(Gtk::Stock::QUIT)
-        item.signal_connect('activate') { self.quit }
-        rslt.append(item)
-
-        rslt
       end
+
+      # separator
+      item = Gtk::SeparatorMenuItem.new
+      rslt.append(item)
+
+      # outputs
+      outputs.keys.each do |o|
+        item = Gtk::MenuItem.new("only #{o}")
+        item.signal_connect('activate') do
+          self.screen.switch(o, @selected_resolution[o])
+          # clear preferred resolution, by next rendering will be read from real state
+          @selected_resolution.clear
+        end
+        rslt.append(item)
+      end
+
+      # separator
+      item = Gtk::SeparatorMenuItem.new
+      rslt.append(item)
+      # Quit
+      item = Gtk::ImageMenuItem.new(Gtk::Stock::QUIT)
+      item.signal_connect('activate') { self.quit }
+      rslt.append(item)
+
+      rslt
+    end
 
   end
 
