@@ -121,8 +121,12 @@ module Dumon
 
       # mirror
       item = Gtk::MenuItem.new('mirror')
-      submenu = Gtk::Menu.new
-      item.set_submenu(submenu)
+      if outputs.keys.size > 1
+        submenu = Gtk::Menu.new
+        item.set_submenu(submenu)
+      else
+        item.sensitive = false
+      end
 
       self.screen.common_resolutions.each do |res|
         si = Gtk::MenuItem.new(res)
