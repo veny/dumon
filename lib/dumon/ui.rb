@@ -61,7 +61,7 @@ module Dumon
 
       @tray = Gtk::StatusIcon.new
       @tray.visible = true
-      @tray.pixbuf = Gdk::Pixbuf.new(::File.join(::File.dirname(__FILE__), '..', '..', 'img', 'monitor.png'))
+      @tray.pixbuf = Gdk::Pixbuf.new(::File.join(::File.dirname(__FILE__), '..', 'monitor.png'))
       @tray.tooltip = "Dual Monitor Manager"
 
       @tray.signal_connect('popup-menu') do |w, button, activate_time|
