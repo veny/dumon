@@ -17,6 +17,7 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n").select { |item| item unless item.start_with? 'screenshot' }
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+puts "XX #{s.executables}"
   s.require_paths = ["lib"]
 
   s.extra_rdoc_files = [
