@@ -9,7 +9,7 @@ require 'dumon/version'
 # This module represents the entry point of Dumon tool.
 module Dumon
 
-  autoload :Xrandr,          'dumon/screen'
+  autoload :XrandrManager,   'dumon/omanager'
   autoload :Tray,            'dumon/ui'
 
   class << self
@@ -33,8 +33,8 @@ Dumon::logger.info \
 
 
 # start the app
-screen = Dumon::Xrandr.new
+omanager = Dumon::XrandrManager.new
 
 ui = Dumon::Tray.new
-ui.screen = screen
+ui.omanager = omanager
 ui.render

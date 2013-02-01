@@ -5,8 +5,8 @@ module Dumon
   class Ui
 
     ###
-    # Output manager used to manipulate the outputs.
-    attr_accessor :screen
+    # Output manager used to manipulate the output.
+    attr_accessor :omanager
 
     ###
     # Renders the UI.
@@ -50,7 +50,6 @@ module Dumon
 
   ###
   # This class represents a user interface represented by system tray icon and its context menu.
-  # about outputs available on your system look like.
   class Tray < GtkUi
 
     def initialize #:nodoc:
@@ -75,7 +74,7 @@ module Dumon
     ###
     # Reads info about currently usable outputs and construct corresponding structure of context menu.
     def create_menu
-      outputs = self.screen.read
+      outputs = self.omanager.read
 
       rslt = Gtk::Menu.new
 
@@ -86,7 +85,7 @@ module Dumon
         item.set_submenu(submenu)
 
         # to be marked with '*'
-        defres = self.screen.default_resolution(o)
+        defres = self.omanager.default_resolution(o)
 
         # radio buttons group
         radios = []
@@ -112,7 +111,7 @@ module Dumon
       outputs.keys.each do |o|
         item = Gtk::MenuItem.new("only #{o}")
         item.signal_connect('activate') do
-          self.screen.switch(o, @selected_resolution[o])
+          self.omanager.switch(o, @selected_resolution[o])
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end
@@ -128,9 +127,9 @@ module Dumon
         item.sensitive = false
       end
 
-      self.screen.common_resolutions.each do |res|
+      self.omanager.common_resolutions.each do |res|
         si = Gtk::MenuItem.new(res)
-        si.signal_connect('activate') { self.screen.mirror(res) }
+        si.signal_connect('activate') { self.omanager.mirror(res) }
         submenu.append(si)
       end
       rslt.append(item)

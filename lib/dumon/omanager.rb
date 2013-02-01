@@ -1,16 +1,16 @@
 module Dumon
 
   ###
-  # This class represents an abstract pattern how concrete classes provide info
-  # about outputs available on your system.
-  class Screen
+  # This class represents a base class defining how concrete sub-classes manage
+  # output devices available on your system.
+  class OutDeviceManager
 
     ###
-    # System tool to be used for outputs management.
+    # System tool to be used for output devices management.
     attr_accessor :stool
 
     ###
-    # Cached information about current outputs.
+    # Cached information about current output devices.
     # Format: {output_name=>{:default=>"AxB",:current=>"CxD",:resolutions=>[...], ...}
     # Sample: {
     #   "LVDS1"=>{:resolutions=>["1600x900", "1024x768"], :default=>"1600x900"},
@@ -19,25 +19,25 @@ module Dumon
     attr_accessor :outputs
 
     ###
-    # Reads info about current accessible outputs and their settings.
+    # Reads info about current accessible output devices and their settings.
     def read
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
     ###
-    # Switch monitor to given output with given resolution.
+    # Switch to given output device with given resolution.
     def switch(output, resolution, type=nil)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
     ###
-    # Mirrors output on all monitors with given resolution.
+    # Mirrors output on all devices with given resolution.
     def mirror(resolution)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
     ###
-    # Gets default resolution of given output.
+    # Gets default resolution of given output device.
     def default_resolution(output)
       raise 'no outputs' if self.outputs.nil? or self.outputs.empty?
       raise "unknown output: #{output}" unless self.outputs.keys.include?(output)
@@ -47,7 +47,7 @@ module Dumon
     end
 
     ###
-    # Gets list of common resolutions of all outputs
+    # Gets list of common resolutions of all output devices.
     def common_resolutions
       raise 'no outputs' if self.outputs.nil? or self.outputs.empty?
 
@@ -67,8 +67,8 @@ module Dumon
 
 
   ###
-  # This class manages outputs via *xrandr* system tool.
-  class Xrandr < Screen
+  # This class manages output devices via *xrandr* system tool.
+  class XrandrManager < OutDeviceManager
 
     ###
     # Constructor.
