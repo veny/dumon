@@ -25,14 +25,21 @@ module Dumon
     end
 
     ###
-    # Switch to given output device with given resolution.
-    def switch(output, resolution, type=nil)
+    # Switch to given single output device with given resolution.
+    def single(output, resolution, type=nil)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
     ###
     # Mirrors output on all devices with given resolution.
     def mirror(resolution)
+      raise NotImplementedError, 'this should be overridden by concrete sub-class'
+    end
+
+    ###
+    # Distributes output to given devices with given order and resolution.
+    # *param* outputs in form [["LVDS1", "1600x900"], [VGA1", "1920x1080"]]
+    def sequence(outputs)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
@@ -94,7 +101,7 @@ module Dumon
     def read #:nodoc:
       rslt = {}
       output = nil
-      xrandr_out = `#{self.stool}`
+      xrandr_out = `#{self.stool} -q`
       xrandr_out.each_line do |line|
         if line =~ /^\w+ connected /
           output = line[/^\w+/]
@@ -113,7 +120,7 @@ module Dumon
       rslt
     end
 
-    def switch(output, resolution, type=nil) #:nodoc:
+    def single(output, resolution, type=nil) #:nodoc:
       self.read if self.outputs.nil? or self.outputs.empty?
       raise "uknown output: #{output}" unless self.outputs.keys.include?(output)
 
@@ -133,6 +140,23 @@ module Dumon
 
       cmd = "#{self.stool}"
       self.outputs.keys.each { |o| cmd << " --output #{o} --mode #{resolution}" }
+
+      Dumon::logger.debug "Command: #{cmd}"
+      `#{cmd}`
+    end
+
+    def sequence(outputs) #:nodoc:
+      raise 'not an array' unless outputs.kind_of?(Array)
+      outputs.each { |pair| raise 'item not a pair' if !pair.kind_of?(Array) and pair.size != 2 }
+
+      cmd = "#{self.stool}"
+      for i in 0..outputs.size - 1
+        output = outputs[i][0]
+        resolution = outputs[i][1]
+        resolution = self.default_resolution(output) if resolution.nil?
+        cmd << " --output #{output} --mode #{resolution}"
+        cmd << " --right-of #{outputs[i - 1][0]}" if i > 0
+      end
 
       Dumon::logger.debug "Command: #{cmd}"
       `#{cmd}`

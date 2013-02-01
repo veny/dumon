@@ -26,7 +26,7 @@ end
 # Configuration of logging.
 Dumon::logger = Logger.new(STDOUT)
 Dumon::logger.level = Logger::INFO
-Dumon::logger.level = Logger::DEBUG
+#Dumon::logger.level = Logger::DEBUG
 
 Dumon::logger.info \
     "Dumon #{Dumon::VERSION}, running on Ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]"

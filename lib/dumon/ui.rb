@@ -91,7 +91,7 @@ module Dumon
         radios = []
 
         outputs[o][:resolutions].each do |res|
-          si = Gtk::RadioMenuItem.new(radios, defres === res ? "#{res} *" : res)
+          si = Gtk::RadioMenuItem.new(radios, defres === res ? "#{res} [*]" : res)
           si.active = (@selected_resolution[o] === res or (@selected_resolution[o].nil? and outputs[o][:current] === res))
           radios << si
           si.signal_connect('activate') do
@@ -111,7 +111,7 @@ module Dumon
       outputs.keys.each do |o|
         item = Gtk::MenuItem.new("only #{o}")
         item.signal_connect('activate') do
-          self.omanager.switch(o, @selected_resolution[o])
+          self.omanager.single(o, @selected_resolution[o])
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end
@@ -133,6 +133,26 @@ module Dumon
         submenu.append(si)
       end
       rslt.append(item)
+
+      # sequence (currently supporting only 2 output devices)
+      if outputs.keys.size >= 2
+        o0 = outputs.keys[0]
+        o1 = outputs.keys[1]
+        item = Gtk::MenuItem.new("#{o0} left of #{o1}")
+        item.signal_connect('activate') do
+          self.omanager.sequence([[o0, @selected_resolution[o0]], [o1, @selected_resolution[o1]]])
+          # clear preferred resolution, by next rendering will be read from real state
+          @selected_resolution.clear
+        end
+        rslt.append(item)
+        item = Gtk::MenuItem.new("#{o1} left of #{o0}")
+        item.signal_connect('activate') do
+          self.omanager.sequence([[o1, @selected_resolution[o1]], [o0, @selected_resolution[o0]]])
+          # clear preferred resolution, by next rendering will be read from real state
+          @selected_resolution.clear
+        end
+        rslt.append(item)
+      end
 
       # separator
       item = Gtk::SeparatorMenuItem.new
