@@ -1,6 +1,6 @@
 # dumon
 
-Dual monitor manager  for linux.
+Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon and its context menu.
 
 ## SCREENSHOTS
 
