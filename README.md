@@ -37,7 +37,7 @@ Dual monitor manager  for linux.
 * vaclav.sykora@gmail.com
 * https://plus.google.com/115674031373998885915
 
-== LICENSE
+## LICENSE
 
 * Apache License, Version 2.0, http://www.apache.org/licenses/
 * see LICENSE file for more details...
