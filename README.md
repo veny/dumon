@@ -23,9 +23,10 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
  > ruby -r dumon -e 'Dumon::run'
 
 * or add GEM PATH (see 'gem environment') into your PATH and then
+
  > dumon
 
-### Important Upgrade Notice
+### UPGRADE NOTICES
 
 * see lib/dumon/version.rb
 
