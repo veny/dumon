@@ -20,21 +20,27 @@ module Dumon
 
   end
 
+
+  ###
+  # Runs the application.
+  def self.run
+    ui = Dumon::Tray.new
+    ui.omanager = Dumon::XrandrManager.new
+    ui.render
+  end
+
 end
 
 
 # Configuration of logging.
 Dumon::logger = Logger.new(STDOUT)
 Dumon::logger.level = Logger::INFO
-#Dumon::logger.level = Logger::DEBUG
 
 Dumon::logger.info \
     "Dumon #{Dumon::VERSION}, running on Ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]"
 
 
-# start the app
-omanager = Dumon::XrandrManager.new
+# development
+#Dumon::logger.level = Logger::DEBUG
+#Dumon::run
 
-ui = Dumon::Tray.new
-ui.omanager = omanager
-ui.render

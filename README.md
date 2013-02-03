@@ -13,11 +13,21 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 [![](https://raw.github.com/veny/dumon/master/screenshots/mirror_menu.png)](https://raw.github.com/veny/dumon/master/screenshots/mirror_menu.png)
 
 
-## INSTALL
-
+## USAGE
+### INSTALL
  > sudo gem install dumon
 
 * gem published on http://rubygems.org/gems/dumon
+
+### START
+ > ruby -r dumon -e 'Dumon::run'
+
+* or add GEM PATH (see 'gem environment') into your PATH and then
+ > dumon
+
+### Important Upgrade Notice
+
+* see lib/dumon/version.rb
 
 
 ## FEATURES/PROBLEMS
