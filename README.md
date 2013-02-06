@@ -29,6 +29,7 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 * or as daemon process
 
  > ruby -r dumon -e 'Dumon::run' --daemon
+
  > dumon --daemon
 
 ### UPGRADE NOTICES
@@ -42,6 +43,7 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 * by default to 'STDOUT' on level 'INFO'
 
  > Dumon.logger = Logger.new('/tmp/log.txt')
+
  > Dumon.logger.level = Logger::DEBUG
 
 
