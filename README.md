@@ -28,7 +28,7 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 
 * or as daemon process
 
- > ruby -r dumon -e 'Dumon::run' --daemon
+ > ruby -r dumon -e 'Dumon::run true'
 
  > dumon --daemon
 

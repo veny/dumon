@@ -23,8 +23,8 @@ module Dumon
 
   ###
   # Runs the application.
-  def self.run
-    if ARGV[0] == '--daemon'
+  def self.run(daemon=false)
+    if daemon
       if RUBY_VERSION < '1.9'
         Dumon::logger.warn 'Daemon mode supported only in Ruby >= 1.9'
       else
@@ -55,4 +55,4 @@ Dumon::logger.info \
 
 # development
 #Dumon::logger.level = Logger::DEBUG
-#Dumon::run
+#Dumon::run(ARGV[0] == '--daemon')
