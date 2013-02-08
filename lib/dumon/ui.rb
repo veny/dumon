@@ -59,6 +59,9 @@ module Dumon
       # {"LVDS1" => "1600x900", "VGA1" => "800x600"}
       @selected_resolution = {}
 
+      # primary output
+      @primary = :none
+
       @tray = Gtk::StatusIcon.new
       @tray.visible = true
       @tray.pixbuf = Gdk::Pixbuf.new(::File.join(::File.dirname(__FILE__), '..', 'monitor.png'))
@@ -120,7 +123,7 @@ module Dumon
 
       # mirror
       item = Gtk::MenuItem.new('mirror')
-      if outputs.keys.size > 1
+      if outputs.keys.size >= 2
         submenu = Gtk::Menu.new
         item.set_submenu(submenu)
       else
@@ -134,20 +137,44 @@ module Dumon
       end
       rslt.append(item)
 
+      # separator
+      item = Gtk::SeparatorMenuItem.new
+      rslt.append(item)
+
+      # primary output
+      item = Gtk::MenuItem.new('primary output')
+      if outputs.keys.size >= 2
+        submenu = Gtk::Menu.new
+        item.set_submenu(submenu)
+      else
+        item.sensitive = false
+      end
+
+      radios = []
+      prims = outputs.keys.clone << :none
+      prims.each do |o|
+        si = Gtk::RadioMenuItem.new(radios, o.to_s)
+        si.active = (@primary.to_s == o.to_s)
+        radios << si
+        si.signal_connect('activate') { @primary = o.to_s if si.active? }
+        submenu.append(si)
+      end
+      rslt.append(item)
+
       # sequence (currently supporting only 2 output devices)
       if outputs.keys.size >= 2
         o0 = outputs.keys[0]
         o1 = outputs.keys[1]
         item = Gtk::MenuItem.new("#{o0} left of #{o1}")
         item.signal_connect('activate') do
-          self.omanager.sequence([[o0, @selected_resolution[o0]], [o1, @selected_resolution[o1]]])
+          self.omanager.sequence([[o0, @selected_resolution[o0]], [o1, @selected_resolution[o1]]], @primary)
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end
         rslt.append(item)
         item = Gtk::MenuItem.new("#{o1} left of #{o0}")
         item.signal_connect('activate') do
-          self.omanager.sequence([[o1, @selected_resolution[o1]], [o0, @selected_resolution[o0]]])
+          self.omanager.sequence([[o1, @selected_resolution[o1]], [o0, @selected_resolution[o0]]], @primary)
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end

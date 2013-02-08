@@ -39,7 +39,8 @@ module Dumon
     ###
     # Distributes output to given devices with given order and resolution.
     # *param* outputs in form [["LVDS1", "1600x900"], [VGA1", "1920x1080"]]
-    def sequence(outputs)
+    # *param* primary name of primary output
+    def sequence(outputs, primary)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
@@ -145,7 +146,7 @@ module Dumon
       `#{cmd}`
     end
 
-    def sequence(outputs) #:nodoc:
+    def sequence(outputs, primary=:none) #:nodoc:
       raise 'not an array' unless outputs.kind_of?(Array)
       outputs.each { |pair| raise 'item not a pair' if !pair.kind_of?(Array) and pair.size != 2 }
 
@@ -155,6 +156,7 @@ module Dumon
         resolution = outputs[i][1]
         resolution = self.default_resolution(output) if resolution.nil?
         cmd << " --output #{output} --mode #{resolution}"
+        cmd << ' --primary' if primary.to_s == output
         cmd << " --right-of #{outputs[i - 1][0]}" if i > 0
       end
 
