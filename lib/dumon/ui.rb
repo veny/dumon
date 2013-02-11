@@ -143,12 +143,9 @@ module Dumon
 
       # primary output
       item = Gtk::MenuItem.new('primary output')
-      if outputs.keys.size >= 2
-        submenu = Gtk::Menu.new
-        item.set_submenu(submenu)
-      else
-        item.sensitive = false
-      end
+      submenu = Gtk::Menu.new
+      item.set_submenu(submenu)
+      item.sensitive = (outputs.keys.size >= 2)
 
       radios = []
       prims = outputs.keys.clone << :none
