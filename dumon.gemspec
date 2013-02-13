@@ -17,15 +17,10 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split("\n").select { |item| item unless item.start_with? 'screenshot' }
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = ["lib"]
-
-  s.extra_rdoc_files = [
-    "LICENSE",
-    "README.md"
-  ]
+  s.require_paths = ['lib']
+  s.extra_rdoc_files = ['LICENSE', 'README.md']
   s.homepage = %q{http://github.com/veny/dumon}
   s.rdoc_options = ['--charset=UTF-8']
-  s.require_paths = ['lib']
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{Dual monitor manager for Linux.}
 

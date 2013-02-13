@@ -21,6 +21,12 @@ module Dumon
       Dumon::logger.info "Terminted..."
     end
 
+    ###
+    # Provides information about the app.
+    def about
+      raise NotImplementedError, 'this should be overridden by concrete sub-class'
+    end
+
   end
 
 
@@ -45,6 +51,18 @@ module Dumon
       Gtk.main_quit
     end
 
+    def about #:nodoc:
+      about = Gtk::AboutDialog.new
+      about.set_program_name 'Dumon'
+      about.set_version Dumon::VERSION
+      about.set_copyright "(c) Vaclav Sykora"
+      about.set_comments 'Dual monitor manager'
+      about.set_website 'https://github.com/veny/dumon'
+      about.set_logo Gdk::Pixbuf.new(::File.join(::File.dirname(__FILE__), '..', 'monitor48.png'))
+      about.run
+      about.destroy
+    end
+
   end
 
 
@@ -64,7 +82,7 @@ module Dumon
 
       @tray = Gtk::StatusIcon.new
       @tray.visible = true
-      @tray.pixbuf = Gdk::Pixbuf.new(::File.join(::File.dirname(__FILE__), '..', 'monitor.png'))
+      @tray.pixbuf = Gdk::Pixbuf.new(::File.join(::File.dirname(__FILE__), '..', 'monitor24.png'))
       @tray.tooltip = "Dual Monitor Manager"
 
       @tray.signal_connect('popup-menu') do |w, button, activate_time|
@@ -180,6 +198,10 @@ module Dumon
 
       # separator
       item = Gtk::SeparatorMenuItem.new
+      rslt.append(item)
+      # About
+      item = Gtk::ImageMenuItem.new(Gtk::Stock::ABOUT)
+      item.signal_connect('activate') { self.about }
       rslt.append(item)
       # Quit
       item = Gtk::ImageMenuItem.new(Gtk::Stock::QUIT)
