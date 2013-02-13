@@ -1,11 +1,11 @@
- ____
-|  _ \ _   _ _ __ ___   ___  _ __
-| | | | | | | '_ ` _ \ / _ \| '_ \
-| |_| | |_| | | | | | | (_) | | | |
-|____/ \__,_|_| |_| |_|\___/|_| |_|
+           ____
+          |  _ \ _   _ _ __ ___   ___  _ __
+          | | | | | | | '_ ` _ \ / _ \| '_ \
+          | |_| | |_| | | | | | | (_) | | | |
+          |____/ \__,_|_| |_| |_|\___/|_| |_|
 
 
-<center><small>Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon and its context menu.</small></center>
+Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon and its context menu.
 
 ## SCREENSHOTS
 
