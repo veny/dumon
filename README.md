@@ -5,7 +5,7 @@
 |____/ \__,_|_| |_| |_|\___/|_| |_|
 
 
-Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon and its context menu.
+<center><small>Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon and its context menu.</small></center>
 
 ## SCREENSHOTS
 
