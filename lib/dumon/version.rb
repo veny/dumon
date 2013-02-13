@@ -14,4 +14,10 @@ module Dumon
   # Current version.
   VERSION = VERSION_HISTORY[0][0]
 
+  ###
+  # Returns the version of Dumon.
+  def self.version
+    VERSION
+  end
+
 end

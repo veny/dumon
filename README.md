@@ -1,4 +1,9 @@
-# dumon
+ ____
+|  _ \ _   _ _ __ ___   ___  _ __
+| | | | | | | '_ ` _ \ / _ \| '_ \
+| |_| | |_| | | | | | | (_) | | | |
+|____/ \__,_|_| |_| |_|\___/|_| |_|
+
 
 Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon and its context menu.
 
@@ -55,9 +60,9 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 
 ## REQUIREMENTS
 
-* Ruby 1.9.x
-* ruby-gtk2 1.2.x
-* xrandr 1.3.x
+* Ruby 1.8.7 +
+* ruby-gtk2 1.2.x +
+* xrandr 1.3.x +
 
 ## AUTHOR
 
