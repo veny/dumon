@@ -6,7 +6,14 @@ module Dumon
 
     ###
     # Output manager used to manipulate the output.
-    attr_accessor :omanager
+    attr_reader :omanager
+
+    ###
+    # Constructor.
+    def initialize(options={})
+      omanager_type = options[:omanager] || Dumon::XrandrManager # IoC
+      @omanager = omanager_type.new
+    end
 
     ###
     # Renders the UI.
@@ -37,8 +44,8 @@ module Dumon
     ###
     # Constructor.
     # Initializes the Gtk stuff.
-    def initialize
-      super
+    def initialize(options={})
+      super options
       Gtk.init
     end
 
@@ -70,8 +77,8 @@ module Dumon
   # This class represents a user interface represented by system tray icon and its context menu.
   class Tray < GtkUi
 
-    def initialize #:nodoc:
-      super
+    def initialize(options={}) #:nodoc:
+      super options
 
       # storage of preferred resolution for next rendering (will be cleared by output changing)
       # {"LVDS1" => "1600x900", "VGA1" => "800x600"}
