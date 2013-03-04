@@ -4,19 +4,22 @@ module Dumon
   # This class represents a base class defining how concrete sub-classes manage
   # output devices available on your system.
   class OutDeviceManager
+    include Rrutils::Options
 
     ###
     # System tool to be used for output devices management.
-    attr_accessor :stool
+    attr_reader :stool
 
     ###
     # Cached information about current output devices.
+    # Value will be updated by each invocation of #read.
+    #
     # Format: {output_name=>{:default=>"AxB",:current=>"CxD",:resolutions=>[...], ...}
     # Sample: {
     #   "LVDS1"=>{:resolutions=>["1600x900", "1024x768"], :default=>"1600x900"},
     #   "VGA1" =>{:resolutions=>["1920x1080", "720x400"], :default=>"1920x1080", :current=>"1920x1080"}
     #         }
-    attr_accessor :outputs
+    attr_reader :outputs
 
     ###
     # Switches output according to given mode and corresponding parameters.
@@ -31,48 +34,32 @@ module Dumon
     # {:mode=>:sequence, :outs=>['VGA1', 'LVDS1'], :resolutions=>{'1920x1080', '1600x900'}, :primary=>:none}
     def switch(options)
       # pre-conditions
+      verify_options(options, {
+        :mode => [:single, :mirror, :sequence],
+        :out => :optional, :outs => :optional,
+        :resolution => :optional, :resolutions => :optional,
+        :primary => :optional
+      })
 
-      # mode
-      raise 'no options' if options.nil? or options.empty?
-      raise 'undefined mode' unless options.has_key? :mode
       mode = options[:mode].to_sym
 
       case mode
       when :single
-        raise 'undefined output' if options[:out].nil?
-        single(options[:out])
+        verify_options(options, {:mode => [:single], :out => :mandatory, :resolution => :mandatory})
+        single(options[:out], options[:resolution])
       when :mirror
+        verify_options(options, {:mode => [:mirror], :resolution => :mandatory})
+        mirror(options[:resolution])
       when :sequence
-      else
-        raise "unknown mode: #{mode}"
+        verify_options(options, {:mode => [:sequence], :outs => :mandatory, :resolutions => :mandatory, :primary => :optional})
+        sequence(options[:outs], options[:resolutions], options[:primary])
       end
     end
 
     ###
     # Reads info about current accessible output devices and their settings.
+    # Readed infos will be stored and accessible via reader 'outputs'.
     def read
-      raise NotImplementedError, 'this should be overridden by concrete sub-class'
-    end
-
-    ###
-    # Switch to given single output device with given resolution.
-    # *param* output
-    # *resolution* nil for default resolution
-    def single(output, resolution=nil)
-      raise NotImplementedError, 'this should be overridden by concrete sub-class'
-    end
-
-    ###
-    # Mirrors output on all devices with given resolution.
-    def mirror(resolution)
-      raise NotImplementedError, 'this should be overridden by concrete sub-class'
-    end
-
-    ###
-    # Distributes output to given devices with given order and resolution.
-    # *param* outputs in form [["LVDS1", "1600x900"], [VGA1", "1920x1080"]]
-    # *param* primary name of primary output
-    def sequence(outputs, primary=:none)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
@@ -103,6 +90,31 @@ module Dumon
       rslt
     end
 
+
+    protected
+
+    ###
+    # Switch to given single output device with given resolution.
+    # *param* output
+    # *resolution* nil for default resolution
+    def single(output, resolution=nil)
+      raise NotImplementedError, 'this should be overridden by concrete sub-class'
+    end
+
+    ###
+    # Mirrors output on all devices with given resolution.
+    def mirror(resolution)
+      raise NotImplementedError, 'this should be overridden by concrete sub-class'
+    end
+
+    ###
+    # Distributes output to given devices with given order and resolution.
+    # *param* outputs in form [["LVDS1", "1600x900"], [VGA1", "1920x1080"]]
+    # *param* primary name of primary output
+    def sequence(outputs, primary=:none)
+      raise NotImplementedError, 'this should be overridden by concrete sub-class'
+    end
+
   end
 
 
@@ -118,7 +130,7 @@ module Dumon
       paths.each do |path|
         begin
           `#{path}`
-          self.stool = path
+          @stool = path
           Dumon.logger.info "System tool found: #{path}"
           break
         rescue  => e
@@ -128,11 +140,14 @@ module Dumon
 
       raise "no system tool found, checked for #{paths}" if self.stool.nil?
 
+      # just to check if it works
       self.read
     end
 
     def read #:nodoc:
+      @outputs = nil # clear previous info
       rslt = {}
+
       output = nil
       xrandr_out = `#{self.stool} -q`
       xrandr_out.each_line do |line|
@@ -147,9 +162,14 @@ module Dumon
           rslt[output][:resolutions] << resolution
         end
       end
-
       Dumon::logger.debug "Outputs found: #{rslt}"
-      self.outputs = rslt
+
+      # verify structure of readed infos
+      rslt.keys.each do |k|
+        verify_options(rslt[k], {:resolutions=>:mandatory, :default=>:mandatory, :current=>:optional})
+      end
+
+      @outputs = rslt
       rslt
     end
 

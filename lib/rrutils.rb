@@ -1,6 +1,5 @@
 ###
-# This module represents namespace of Rrutils
-# meaning Reasonable Ruby Utils
+# This module represents namespace of Rrutils meaning 'Reasonable Ruby Utilities'
 # - yet another general purpose utilities package.
 module Rrutils
 

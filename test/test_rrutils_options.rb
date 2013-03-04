@@ -6,6 +6,14 @@ require 'rrutils'
 class TestRrutilsOptions < Test::Unit::TestCase
   include Rrutils::Options
 
+  def test_verify_options_preconditions
+    assert_raise ArgumentError do verify_options(nil, {:a => 'A'}); end
+    assert_raise ArgumentError do verify_options('a string', {:a => 'A'}); end
+    assert_raise ArgumentError do verify_options({:b => 'B'}, nil); end
+    assert_raise ArgumentError do verify_options({:b => 'B'}, {}); end
+    assert_raise ArgumentError do verify_options({:b => 'B'}, 'a string'); end
+  end
+
   def test_verify_options
     opt_pattern = {:a => :mandatory, :b => :optional, :c => 'predefined', :d => [1, false]}
     assert_nothing_thrown do verify_options({:a => 'A', :b => 'B', :c => 'C', :d => 1}, opt_pattern); end

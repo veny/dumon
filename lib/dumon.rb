@@ -3,10 +3,10 @@
 require 'singleton'
 require 'logger'
 require 'gtk2'
+require 'rrutils'
 require 'dumon/version'
 require 'dumon/omanager'
 require 'dumon/ui'
-require 'rrutils/confdb'
 
 
 ###

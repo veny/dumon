@@ -145,11 +145,11 @@ module Dumon
       item = Gtk::SeparatorMenuItem.new
       rslt.append(item)
 
-      # outputs
+      # single outputs
       outputs.keys.each do |o|
         item = Gtk::MenuItem.new("only #{o}")
         item.signal_connect('activate') do
-          self.omanager.single(o, @selected_resolution[o])
+          self.omanager.switch({:mode=>:single, :out=>o, :resolution=>@selected_resolution[o]})
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end
@@ -167,7 +167,7 @@ module Dumon
 
       self.omanager.common_resolutions.each do |res|
         si = Gtk::MenuItem.new(res)
-        si.signal_connect('activate') { self.omanager.mirror(res) }
+        si.signal_connect('activate') { self.omanager.switch({:mode=>:mirror, :resolution=>res}) }
         submenu.append(si)
       end
       rslt.append(item)
