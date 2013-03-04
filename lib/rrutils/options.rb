@@ -32,7 +32,7 @@ module Rrutils
         # :mandatory
         if v == :mandatory
           raise ArgumentError, "missing mandatory option: #{k}" unless options.keys.include? k
-        else if v.is_a? Array
+        elsif v.is_a? Array
           raise ArgumentError, "value '#{options[k]}' not in #{v.inspect}, key=#{k}" unless v.include?(options[k])
         end
       end
@@ -47,14 +47,16 @@ module Rrutils
     # Usage:
     # verify_and_sanitize_options(options_to_be_verified, {:foo=>'defaultValue', :bar=>100})
     #
-    def verify_and_sanitize_options(options, pattern)
-      verify_options(options, pattern)
+    def verify_and_sanitize_options(options, pattern, cloned=true)
+      opts = options.clone if cloned
+
+      verify_options(opts, pattern)
 
       # set default values if missing in options
-      pattern.each do |k,v|
-        options[k] = v if !v.nil? and v != :optional and !options.keys.include? k
+      pattern.select { |k,v| !v.nil? and v != :optional }.each do |k,v|
+        opts[k] = v if !opts.keys.include? k
       end
-      options
+      opts
     end
 
   end
