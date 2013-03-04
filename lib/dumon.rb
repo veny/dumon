@@ -3,26 +3,21 @@
 require 'singleton'
 require 'logger'
 require 'gtk2'
+require 'confdb.rb'
 require 'dumon/version'
+require 'dumon/omanager'
+require 'dumon/ui'
 
 
 ###
 # This module represents namespace of Dumon tool.
 module Dumon
 
-  autoload :Confdb,         'confdb.rb'
-  autoload :XrandrManager,  'dumon/omanager'
-  autoload :Tray,           'dumon/ui'
-
   class << self
 
     ###
     # Logger used for logging output.
     attr_accessor :logger
-
-    ###
-    #
-#    attr_accessor :conf
 
   end
 
@@ -38,10 +33,34 @@ module Dumon
     attr_reader :ui
 
     ###
+    # Primary output.
+    attr_accessor :primary_output
+
+    ###
     # Constructor.
-    def initialize(options={})
-      ui_type = options[:ui] || Dumon::Tray # IoC
-      @ui = ui_type.new
+    def initialize
+      @ui = new_ui
+      Dumon::logger.debug "Used UI: #{ui.class.name}"
+
+      # storage of preferred resolution for next rendering (will be cleared by output changing)
+      # {"LVDS1" => "1600x900", "VGA1" => "800x600"}
+      @selected_resolution = {}
+
+      # initial primary output
+      self.primary_output = :none
+    end
+
+    ###
+    # Factory method to create a new object of UI.<p/>
+    # Can be used as Dependency Injection (DI) entry point:
+    # you can reopen Dumon:App and redefine 'new_ui' if you implement a new UI class.
+    # <pre>
+    # class Dumon::App
+    #   def new_ui; Dumon::XyUi.new; end
+    # end
+    # </pre>
+    def new_ui(with=Dumon::GtkTrayUi)
+      with.new
     end
 
     ###
@@ -59,7 +78,7 @@ module Dumon
         end
       end
 
-      write
+#      write
       ui.render
     end
 
@@ -68,17 +87,16 @@ module Dumon
 end
 
 
+# Default configuration of logging.
+Dumon::logger = Logger.new(STDOUT)
+Dumon::logger.level = Logger::INFO
+
+Dumon::logger.info \
+    "Dumon #{Dumon::VERSION}, running on Ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]"
+
+
+# development mode
 if __FILE__ == $0
-
-  # Configuration of logging.
-  Dumon::logger = Logger.new(STDOUT)
-  Dumon::logger.level = Logger::INFO
-
-  Dumon::logger.info \
-      "Dumon #{Dumon::VERSION}, running on Ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]"
+  Dumon::logger.level = Logger::DEBUG
+  Dumon::App.instance.run(ARGV[0] == '--daemon')
 end
-
-
-# development
-Dumon::logger.level = Logger::DEBUG
-Dumon::App.instance.run(ARGV[0] == '--daemon')

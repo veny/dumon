@@ -10,9 +10,22 @@ module Dumon
 
     ###
     # Constructor.
-    def initialize(options={})
-      omanager_type = options[:omanager] || Dumon::XrandrManager # IoC
-      @omanager = omanager_type.new
+    def initialize
+      @omanager = new_omanager
+      Dumon::logger.debug "Used output manager: #{omanager.class.name}"
+    end
+
+    ###
+    # Factory method to create a new object of output manager.<p/>
+    # Can be used as Dependency Injection (DI) entry point:
+    # you can reopen Dumon:Ui and redefine 'new_omanager' if you implement a new output manager.
+    # <pre>
+    # class Dumon::Ui
+    #   def new_omanager; Dumon::XyManager.new; end
+    # end
+    # </pre>
+    def new_omanager(with=Dumon::XrandrManager)
+      with.new
     end
 
     ###
@@ -44,8 +57,8 @@ module Dumon
     ###
     # Constructor.
     # Initializes the Gtk stuff.
-    def initialize(options={})
-      super options
+    def initialize
+      super
       Gtk.init
     end
 
@@ -75,17 +88,14 @@ module Dumon
 
   ###
   # This class represents a user interface represented by system tray icon and its context menu.
-  class Tray < GtkUi
+  class GtkTrayUi < GtkUi
 
-    def initialize(options={}) #:nodoc:
-      super options
+    def initialize #:nodoc:
+      super
 
       # storage of preferred resolution for next rendering (will be cleared by output changing)
       # {"LVDS1" => "1600x900", "VGA1" => "800x600"}
       @selected_resolution = {}
-
-      # primary output
-      @primary = :none
 
       @tray = Gtk::StatusIcon.new
       @tray.visible = true
@@ -170,15 +180,16 @@ module Dumon
       item = Gtk::MenuItem.new('primary output')
       submenu = Gtk::Menu.new
       item.set_submenu(submenu)
-      item.sensitive = (outputs.keys.size >= 2)
+#AAA      item.sensitive = (outputs.keys.size >= 2)
+puts "XXX #{App.instance.primary_output}"
 
       radios = []
       prims = outputs.keys.clone << :none
       prims.each do |o|
         si = Gtk::RadioMenuItem.new(radios, o.to_s)
-        si.active = (@primary.to_s == o.to_s)
+        si.active = (App.instance.primary_output.to_s == o.to_s)
         radios << si
-        si.signal_connect('activate') { @primary = o.to_s if si.active? }
+        si.signal_connect('activate') { App.instance.primary_output = o.to_s if si.active? }
         submenu.append(si)
       end
       rslt.append(item)
