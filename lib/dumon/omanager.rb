@@ -19,6 +19,36 @@ module Dumon
     attr_accessor :outputs
 
     ###
+    # Switches output according to given mode and corresponding parameters.
+    #
+    # Possible options:
+    #
+    # Single output:
+    # {:mode=>:single, :out=>'VGA1', :resolution=>'1600x900'}
+    # Mirrored outputs:
+    # {:mode=>:mirror, :resolution=>'1600x900'}
+    # Sequence of outputs:
+    # {:mode=>:sequence, :outs=>['VGA1', 'LVDS1'], :resolutions=>{'1920x1080', '1600x900'}, :primary=>:none}
+    def switch(options)
+      # pre-conditions
+
+      # mode
+      raise 'no options' if options.nil? or options.empty?
+      raise 'undefined mode' unless options.has_key? :mode
+      mode = options[:mode].to_sym
+
+      case mode
+      when :single
+        raise 'undefined output' if options[:out].nil?
+        single(options[:out])
+      when :mirror
+      when :sequence
+      else
+        raise "unknown mode: #{mode}"
+      end
+    end
+
+    ###
     # Reads info about current accessible output devices and their settings.
     def read
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
@@ -26,7 +56,9 @@ module Dumon
 
     ###
     # Switch to given single output device with given resolution.
-    def single(output, resolution, type=nil)
+    # *param* output
+    # *resolution* nil for default resolution
+    def single(output, resolution=nil)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
@@ -40,7 +72,7 @@ module Dumon
     # Distributes output to given devices with given order and resolution.
     # *param* outputs in form [["LVDS1", "1600x900"], [VGA1", "1920x1080"]]
     # *param* primary name of primary output
-    def sequence(outputs, primary)
+    def sequence(outputs, primary=:none)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
@@ -82,7 +114,7 @@ module Dumon
     # Constructor.
     # Checks whether the 'xrandr' system tool is there.
     def initialize
-      paths = ['xrandr', '/usr/bin/xrandr']
+      paths = ['/usr/bin/xrandr', 'xrandr']
       paths.each do |path|
         begin
           `#{path}`
@@ -121,7 +153,7 @@ module Dumon
       rslt
     end
 
-    def single(output, resolution, type=nil) #:nodoc:
+    def single(output, resolution=nil) #:nodoc:
       self.read if self.outputs.nil? or self.outputs.empty?
       raise "uknown output: #{output}" unless self.outputs.keys.include?(output)
 

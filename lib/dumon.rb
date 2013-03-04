@@ -3,10 +3,10 @@
 require 'singleton'
 require 'logger'
 require 'gtk2'
-require 'confdb.rb'
 require 'dumon/version'
 require 'dumon/omanager'
 require 'dumon/ui'
+require 'rrutils/confdb'
 
 
 ###
@@ -26,7 +26,7 @@ module Dumon
   # This class represents an entry point
   class App
     include ::Singleton
-    include Confdb
+    include Rrutils::Confdb
 
     ###
     # User interface of Dumon tool.
