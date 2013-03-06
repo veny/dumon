@@ -33,10 +33,6 @@ module Dumon
     attr_reader :ui
 
     ###
-    # Primary output.
-    attr_accessor :primary_output
-
-    ###
     # Constructor.
     def initialize
       @ui = new_ui
@@ -45,9 +41,6 @@ module Dumon
       # storage of preferred resolution for next rendering (will be cleared by output changing)
       # {"LVDS1" => "1600x900", "VGA1" => "800x600"}
       @selected_resolution = {}
-
-      # initial primary output
-      self.primary_output = :none
     end
 
     ###

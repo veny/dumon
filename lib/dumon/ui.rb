@@ -97,6 +97,9 @@ module Dumon
       # {"LVDS1" => "1600x900", "VGA1" => "800x600"}
       @selected_resolution = {}
 
+      # initial primary output
+      @primary_output = :none
+
       @tray = Gtk::StatusIcon.new
       @tray.visible = true
       @tray.pixbuf = Gdk::Pixbuf.new(::File.join(::File.dirname(__FILE__), '..', 'monitor24.png'))
@@ -186,9 +189,9 @@ module Dumon
       prims = outputs.keys.clone << :none
       prims.each do |o|
         si = Gtk::RadioMenuItem.new(radios, o.to_s)
-        si.active = (App.instance.primary_output.to_s == o.to_s)
+        si.active = (@primary_output.to_s == o.to_s)
         radios << si
-        si.signal_connect('activate') { App.instance.primary_output = o.to_s if si.active? }
+        si.signal_connect('activate') { @primary_output = o.to_s if si.active? }
         submenu.append(si)
       end
       rslt.append(item)
@@ -199,14 +202,14 @@ module Dumon
         o1 = outputs.keys[1]
         item = Gtk::MenuItem.new("#{o0} left of #{o1}")
         item.signal_connect('activate') do
-          omanager.switch({:mode=>:sequence, :outs=>[o0, o1], :resolutions=>[@selected_resolution[o0], @selected_resolution[o1]], :primary=>@primary})
+          omanager.switch({:mode=>:sequence, :outs=>[o0, o1], :resolutions=>[@selected_resolution[o0], @selected_resolution[o1]], :primary=>@primary_output})
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end
         rslt.append(item)
         item = Gtk::MenuItem.new("#{o1} left of #{o0}")
         item.signal_connect('activate') do
-          omanager.switch({:mode=>:sequence, :outs=>[o1, o0], :resolutions=>[@selected_resolution[o1], @selected_resolution[o0]], :primary=>@primary})
+          omanager.switch({:mode=>:sequence, :outs=>[o1, o0], :resolutions=>[@selected_resolution[o1], @selected_resolution[o0]], :primary=>@primary_output})
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end
@@ -216,6 +219,11 @@ module Dumon
       # separator
       item = Gtk::SeparatorMenuItem.new
       rslt.append(item)
+
+      item = Gtk::ImageMenuItem.new('xx')
+      item.signal_connect('activate') { self.quick_message }
+      rslt.append(item)
+
       # About
       item = Gtk::ImageMenuItem.new(Gtk::Stock::ABOUT)
       item.signal_connect('activate') { self.about }
@@ -226,6 +234,22 @@ module Dumon
       rslt.append(item)
 
       rslt
+    end
+
+    ###
+    # Function to open a dialog box displaying the message provided.
+    def quick_message
+      # create the dialog
+      dialog = Gtk::Dialog.new('Store profile', nil, Gtk::Dialog::MODAL,
+          [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE], [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_REJECT])
+      # ensure that the dialog box is destroyed when the user responds.
+      dialog.signal_connect('response') { dialog.destroy }
+
+      widget = Gtk::HBox.new(FALSE, 5)
+      widget.add(Gtk::Label.new('Name:'))
+      widget.add(Gtk::Entry.new)
+      dialog.vbox.add(widget)
+      dialog.show_all
     end
 
   end
