@@ -6,6 +6,19 @@ module Rrutils
   module Options
 
     ###
+    # Fails unless +test+ is a true value.
+    #
+    # +msg+ may be a String or a Proc.
+    # If no +msg+ is given, a default message will be used.
+    def assert(test, msg=nil)
+      msg ||= 'failed assertion'
+      unless test
+        msg = msg.call if Proc === msg
+        raise ArgumentError, msg
+      end
+    end
+
+    ###
     # Verifies given options against a pattern that defines checks applied on each option.
     # The pattern is a Hash where property is an expected option's property and value can be:
     # * :optional - corresponding option may or may not be presented
@@ -31,7 +44,7 @@ module Rrutils
       pattern.each do |k,v|
         # :mandatory
         if v == :mandatory
-          raise ArgumentError, "missing mandatory option: #{k}" unless options.keys.include? k
+          raise ArgumentError, "missing mandatory option: #{k}" if !options.keys.include?(k) or options[k].nil?
         elsif v.is_a? Array
           raise ArgumentError, "value '#{options[k]}' not in #{v.inspect}, key=#{k}" unless v.include?(options[k])
         end

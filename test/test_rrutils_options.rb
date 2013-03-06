@@ -23,6 +23,8 @@ class TestRrutilsOptions < Test::Unit::TestCase
     assert_raise ArgumentError do verify_options({}, opt_pattern); end
     assert_raise ArgumentError do verify_options({:a => 'A'}, opt_pattern); end
     assert_raise ArgumentError do verify_options({:d => 1}, opt_pattern); end
+    assert_raise ArgumentError do verify_options({:a => nil, :d => 1}, opt_pattern); end
+    assert_raise ArgumentError do verify_options({:a => 'A', :d => nil}, opt_pattern); end
     # unknown key
     assert_raise ArgumentError do verify_options({:a => 'A', :z => 2}, opt_pattern); end
     # value not in predefined set

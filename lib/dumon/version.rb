@@ -2,7 +2,7 @@ module Dumon
 
   # Version history.
   VERSION_HISTORY = [
-    ['0.1.8',   '2013-03-05', 'Enh #5: Profiles; File based configuration'],
+    ['0.1.8',   '2013-03-07', 'Enh #5: Profiles; File based configuration'],
     ['0.1.7',   '2013-02-13', 'Enh #4: About dialog'],
     ['0.1.6',   '2013-02-11', 'BF #3: Crash by rendering popup menu if only one output is there'],
     ['0.1.5',   '2013-02-08', 'Enh #2: Support for primary output'],

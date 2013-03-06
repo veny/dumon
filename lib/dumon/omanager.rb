@@ -31,7 +31,7 @@ module Dumon
     # Mirrored outputs:
     # {:mode=>:mirror, :resolution=>'1600x900'}
     # Sequence of outputs:
-    # {:mode=>:sequence, :outs=>['VGA1', 'LVDS1'], :resolutions=>{'1920x1080', '1600x900'}, :primary=>:none}
+    # {:mode=>:sequence, :outs=>['VGA1', 'LVDS1'], :resolutions=>['1920x1080', '1600x900'], :primary=>:none}
     def switch(options)
       # pre-conditions
       verify_options(options, {
@@ -45,13 +45,28 @@ module Dumon
 
       case mode
       when :single
-        verify_options(options, {:mode => [:single], :out => :mandatory, :resolution => :mandatory})
-        single(options[:out], options[:resolution])
+        verify_options(options, {:mode => [:single], :out => outputs.keys, :resolution => :optional})
+        out_name = options[:out]
+        # given resolution exists for given output
+        unless options[:resolution].nil?
+          assert(outputs[out_name][:resolutions].include?(options[:resolution]),
+              "unknown resolution: #{options[:resolution]}, output: #{out_name}")
+        end
+        single(out_name, options[:resolution])
       when :mirror
         verify_options(options, {:mode => [:mirror], :resolution => :mandatory})
+        # given resolution exist for all outputs
+        outputs.each do |k,v|
+          assert(v[:resolutions].include?(options[:resolution]), "unknown resolution: #{options[:resolution]}, output: #{k}")
+        end
         mirror(options[:resolution])
       when :sequence
         verify_options(options, {:mode => [:sequence], :outs => :mandatory, :resolutions => :mandatory, :primary => :optional})
+        assert(options[:outs].is_a?(Array), 'parameter :outs has to be Array')
+        assert(options[:resolutions].is_a?(Array), 'parameter :resolutions has to be Array')
+        assert(options[:outs].size == options[:resolutions].size, 'size of :outs and :resolutions does not match')
+        assert(options[:outs].size > 1, 'sequence mode expects at least 2 outputs')
+        assert(outputs.keys.include?(options[:primary]), "unknown primary output: #{options[:primary]}") unless options[:primary].nil?
         sequence(options[:outs], options[:resolutions], options[:primary])
       end
     end
@@ -66,24 +81,24 @@ module Dumon
     ###
     # Gets default resolution of given output device.
     def default_resolution(output)
-      raise 'no outputs' if self.outputs.nil? or self.outputs.empty?
-      raise "unknown output: #{output}" unless self.outputs.keys.include?(output)
-      raise "no default resolution, output: #{output}" unless self.outputs[output].keys.include?(:default)
+      assert(!outputs.nil?, 'no outputs found')
+      assert(outputs.keys.include?(output), "unknown output: #{output}")
+      assert(outputs[output].keys.include?(:default), "no default resolution, output: #{output}")
 
-      self.outputs[output][:default]
+      outputs[output][:default]
     end
 
     ###
     # Gets list of common resolutions of all output devices.
     def common_resolutions
-      raise 'no outputs' if self.outputs.nil? or self.outputs.empty?
+      assert(!outputs.nil?, 'no outputs found')
 
       rslt = []
-      o1 = self.outputs.keys.first
-      self.outputs[o1][:resolutions].each do |res|
-        self.outputs.keys.each do |o|
+      o1 = outputs.keys.first
+      outputs[o1][:resolutions].each do |res|
+        outputs.keys.each do |o|
           next if o === o1
-          rslt << res if self.outputs[o][:resolutions].include?(res)
+          rslt << res if outputs[o][:resolutions].include?(res)
         end
       end
 
@@ -92,6 +107,7 @@ module Dumon
 
 
     protected
+
 
     ###
     # Switch to given single output device with given resolution.
@@ -109,9 +125,10 @@ module Dumon
 
     ###
     # Distributes output to given devices with given order and resolution.
-    # *param* outputs in form [["LVDS1", "1600x900"], [VGA1", "1920x1080"]]
+    # *param* outs in form ['VGA1', 'LVDS1']
+    # *resolutions* in form ['1920x1080', '1600x900']
     # *param* primary name of primary output
-    def sequence(outputs, primary=:none)
+    def sequence(outs, resolutions, primary=:none)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
@@ -165,17 +182,24 @@ module Dumon
       Dumon::logger.debug "Outputs found: #{rslt}"
 
       # verify structure of readed infos
+      assert(!rslt.empty?, 'no outputs found')
       rslt.keys.each do |k|
-        verify_options(rslt[k], {:resolutions=>:mandatory, :default=>:mandatory, :current=>:optional})
+        out_meta = rslt[k]
+        verify_options(out_meta, {:resolutions=>:mandatory, :default=>:mandatory, :current=>:optional})
+        assert(out_meta[:resolutions].size > 1, "no resolution found, output=#{k}")
       end
 
       @outputs = rslt
       rslt
     end
 
+
+    protected
+
+
     def single(output, resolution=nil) #:nodoc:
-      self.read if self.outputs.nil? or self.outputs.empty?
-      raise "uknown output: #{output}" unless self.outputs.keys.include?(output)
+      assert(!outputs.nil?, 'no outputs found')
+      assert(outputs.keys.include?(output), "unknown output: #{output}")
 
       resolution = self.default_resolution(output) if resolution.nil?
 
@@ -189,7 +213,7 @@ module Dumon
     end
 
     def mirror(resolution) #:nodoc:
-      self.read if self.outputs.nil? or self.outputs.empty?
+      assert(!outputs.nil?, 'no outputs found')
 
       cmd = "#{self.stool}"
       self.outputs.keys.each { |o| cmd << " --output #{o} --mode #{resolution}" }
@@ -198,18 +222,15 @@ module Dumon
       `#{cmd}`
     end
 
-    def sequence(outputs, primary=:none) #:nodoc:
-      raise 'not an array' unless outputs.kind_of?(Array)
-      outputs.each { |pair| raise 'item not a pair' if !pair.kind_of?(Array) and pair.size != 2 }
-
+    def sequence(outs, resolutions, primary=:none) #:nodoc:
       cmd = "#{self.stool}"
-      for i in 0..outputs.size - 1
-        output = outputs[i][0]
-        resolution = outputs[i][1]
+      for i in 0..outs.size - 1
+        output = outs[i]
+        resolution = resolutions[i]
         resolution = self.default_resolution(output) if resolution.nil?
         cmd << " --output #{output} --mode #{resolution}"
         cmd << ' --primary' if primary.to_s == output
-        cmd << " --right-of #{outputs[i - 1][0]}" if i > 0
+        cmd << " --right-of #{outs[i - 1]}" if i > 0
       end
 
       Dumon::logger.debug "Command: #{cmd}"

@@ -180,8 +180,7 @@ module Dumon
       item = Gtk::MenuItem.new('primary output')
       submenu = Gtk::Menu.new
       item.set_submenu(submenu)
-#AAA      item.sensitive = (outputs.keys.size >= 2)
-puts "XXX #{App.instance.primary_output}"
+      item.sensitive = (outputs.keys.size >= 2)
 
       radios = []
       prims = outputs.keys.clone << :none
@@ -194,20 +193,20 @@ puts "XXX #{App.instance.primary_output}"
       end
       rslt.append(item)
 
-      # sequence (currently supporting only 2 output devices)
+      # sequence
       if outputs.keys.size >= 2
         o0 = outputs.keys[0]
         o1 = outputs.keys[1]
         item = Gtk::MenuItem.new("#{o0} left of #{o1}")
         item.signal_connect('activate') do
-          self.omanager.sequence([[o0, @selected_resolution[o0]], [o1, @selected_resolution[o1]]], @primary)
+          omanager.switch({:mode=>:sequence, :outs=>[o0, o1], :resolutions=>[@selected_resolution[o0], @selected_resolution[o1]], :primary=>@primary})
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end
         rslt.append(item)
         item = Gtk::MenuItem.new("#{o1} left of #{o0}")
         item.signal_connect('activate') do
-          self.omanager.sequence([[o1, @selected_resolution[o1]], [o0, @selected_resolution[o0]]], @primary)
+          omanager.switch({:mode=>:sequence, :outs=>[o1, o0], :resolutions=>[@selected_resolution[o1], @selected_resolution[o0]], :primary=>@primary})
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end
