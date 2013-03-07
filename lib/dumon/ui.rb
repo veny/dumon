@@ -180,7 +180,7 @@ module Dumon
       rslt.append(item)
 
       # primary output
-      item = Gtk::MenuItem.new('primary output')
+      item = Gtk::MenuItem.new('Primary output')
       submenu = Gtk::Menu.new
       item.set_submenu(submenu)
       item.sensitive = (outputs.keys.size >= 2)
@@ -217,12 +217,17 @@ module Dumon
       end
 
       # separator
-      item = Gtk::SeparatorMenuItem.new
-      rslt.append(item)
+      rslt.append(Gtk::SeparatorMenuItem.new)
 
-      item = Gtk::ImageMenuItem.new('xx')
-      item.signal_connect('activate') { self.quick_message }
+      # Profiles
+      item = Gtk::MenuItem.new('Profiles')
       rslt.append(item)
+      submenu = Gtk::Menu.new
+      item.set_submenu(submenu)
+      submenu.append(Gtk::SeparatorMenuItem.new)
+      item = Gtk::MenuItem.new('Store...')
+      item.signal_connect('activate') { self.quick_message }
+      submenu.append(item)
 
       # About
       item = Gtk::ImageMenuItem.new(Gtk::Stock::ABOUT)
@@ -241,14 +246,19 @@ module Dumon
     def quick_message
       # create the dialog
       dialog = Gtk::Dialog.new('Store profile', nil, Gtk::Dialog::MODAL,
-          [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_NONE], [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_REJECT])
-      # ensure that the dialog box is destroyed when the user responds.
-      dialog.signal_connect('response') { dialog.destroy }
+          [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_OK], [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_REJECT])
 
+      entry = Gtk::Entry.new
       widget = Gtk::HBox.new(FALSE, 5)
       widget.add(Gtk::Label.new('Name:'))
-      widget.add(Gtk::Entry.new)
+      widget.add(entry)
       dialog.vbox.add(widget)
+
+      # ensure that the dialog box is destroyed when the user responds
+      dialog.signal_connect('response') do |w, code|
+        puts "RR #{entry.text}" if Gtk::Dialog::RESPONSE_OK.eql?(code) and entry.text.size > 0
+        dialog.destroy
+      end
       dialog.show_all
     end
 
