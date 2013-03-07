@@ -3,6 +3,7 @@
 require 'singleton'
 require 'logger'
 require 'gtk2'
+require 'fileutils'
 require 'rrutils'
 require 'dumon/version'
 require 'dumon/omanager'
@@ -33,6 +34,10 @@ module Dumon
     attr_reader :ui
 
     ###
+    # Currently used profile.
+    attr_accessor :current_profile
+
+    ###
     # Constructor.
     def initialize
       @ui = new_ui
@@ -57,6 +62,21 @@ module Dumon
     end
 
     ###
+    # Gets default config file.
+    def config_file(mode='r')
+      filename = "#{Dir.home}#{File::SEPARATOR}.config#{File::SEPARATOR}dumon.conf"
+
+      # check and create directory structure
+      dirname = File.dirname filename
+      ::FileUtils.mkdir_p(dirname) unless Dir.exist?(dirname)
+
+      # create file if does not exist
+      File.open(filename, 'w').close unless File.exist? filename
+
+      File.open(filename, mode)
+    end
+
+    ###
     # Runs the application.
     def run(daemon=false)
       if daemon
@@ -71,7 +91,7 @@ module Dumon
         end
       end
 
-#      write
+      #read(config_file)
       ui.render
     end
 

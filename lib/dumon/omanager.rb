@@ -69,6 +69,8 @@ module Dumon
         assert(outputs.keys.include?(options[:primary]), "unknown primary output: #{options[:primary]}") unless options[:primary].nil?
         sequence(options[:outs], options[:resolutions], options[:primary])
       end
+
+      Dumon::App.instance.current_profile = options
     end
 
     ###

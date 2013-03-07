@@ -220,14 +220,9 @@ module Dumon
       rslt.append(Gtk::SeparatorMenuItem.new)
 
       # Profiles
-      item = Gtk::MenuItem.new('Profiles')
+      item = Gtk::MenuItem.new('Profiles...')
+      item.signal_connect('activate') { self.profile_management_dialog }
       rslt.append(item)
-      submenu = Gtk::Menu.new
-      item.set_submenu(submenu)
-      submenu.append(Gtk::SeparatorMenuItem.new)
-      item = Gtk::MenuItem.new('Store...')
-      item.signal_connect('activate') { self.quick_message }
-      submenu.append(item)
 
       # About
       item = Gtk::ImageMenuItem.new(Gtk::Stock::ABOUT)
@@ -242,8 +237,8 @@ module Dumon
     end
 
     ###
-    # Function to open a dialog box displaying the message provided.
-    def quick_message
+    # Function to open a dialog box for profile management.
+    def profile_management_dialog
       # create the dialog
       dialog = Gtk::Dialog.new('Store profile', nil, Gtk::Dialog::MODAL,
           [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_OK], [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_REJECT])
@@ -256,7 +251,10 @@ module Dumon
 
       # ensure that the dialog box is destroyed when the user responds
       dialog.signal_connect('response') do |w, code|
-        puts "RR #{entry.text}" if Gtk::Dialog::RESPONSE_OK.eql?(code) and entry.text.size > 0
+        if Gtk::Dialog::RESPONSE_OK.eql?(code) and entry.text.size > 0
+          Dumon::App.instance.write(entry.text => Dumon::App.instance.current_profile)
+        end
+
         dialog.destroy
       end
       dialog.show_all
