@@ -98,6 +98,15 @@ module Dumon
     ###
     # Runs the application.
     def run(daemon=false)
+      prof_arg = ARGV.select {|i| i.start_with? 'profile:'}.first
+      unless prof_arg.nil?
+        prof_name = prof_arg.split(':')[1]
+        conf = read_config
+        raise "unknown profile, name=#{prof_name}" unless conf[:profiles][prof_name.to_sym]
+        Dumon::logger.info "Started with profile '#{prof_name}'"
+        ui.apply_profile(conf, prof_name)
+      end
+
       if daemon
         if RUBY_VERSION < '1.9'
           Dumon::logger.warn 'Daemon mode supported only in Ruby >= 1.9'
@@ -142,5 +151,5 @@ end
 # development mode
 if __FILE__ == $0
   Dumon::logger.level = Logger::DEBUG
-  Dumon::App.instance.run(ARGV[0] == '--daemon')
+  Dumon::App.instance.run(ARGV.include? '--daemon')
 end

@@ -2,4 +2,4 @@
 
 require 'dumon'
 
-Dumon::App.instance.run(ARGV[0] == '--daemon')
+Dumon::App.instance.run(ARGV.include? '--daemon')

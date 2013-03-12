@@ -25,7 +25,7 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 * gem published on http://rubygems.org/gems/dumon
 
 ### START
- > ruby -r dumon -e 'Dumon::run'
+ > ruby -r dumon -e 'Dumon::App.instance.run'
 
 * or add GEM PATH (see 'gem environment') into your PATH and then
 
@@ -33,9 +33,17 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 
 * or as daemon process
 
- > ruby -r dumon -e 'Dumon::run true'
+ > ruby -r dumon -e 'Dumon::App.instance.run true'
 
  > dumon --daemon
+
+* start with given profile
+
+ > ruby -r dumon -e 'Dumon::App.instance.run' -s 'profile:Profile name'
+
+* or
+
+ > dumon 'profile:Profile name'
 
 ### UPGRADE NOTICES
 

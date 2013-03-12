@@ -237,8 +237,7 @@ module Dumon
 
     ###
     # Applies a profile from configuration according selection in tree view.
-    def apply_profile(conf, iter)
-      prof_name = iter[0]
+    def apply_profile(conf, prof_name)
       profile = conf[:profiles][prof_name.to_sym]
       profile[:mode] = profile[:mode].to_sym
       omanager.switch profile
@@ -294,14 +293,14 @@ module Dumon
       btn_apply.signal_connect('clicked') do
         selection = treeview.selection
         if iter = selection.selected
-          apply_profile(conf, iter)
+          apply_profile(conf, iter[0])
           dialog.destroy
         end
       end
       # double-click on treeview
       treeview.signal_connect("row-activated") do |view, path|
         if iter = view.model.get_iter(path)
-          apply_profile(conf, iter)
+          apply_profile(conf, iter[0])
           dialog.destroy
         end
       end
