@@ -253,6 +253,7 @@ module Dumon
         if entry_store.text.size > 0
           conf[:profiles][entry_store.text] = Dumon::App.instance.current_profile
           Dumon::App.instance.write_config(conf)
+          Dumon::logger.debug "Stored profile, name=#{entry_store.text}"
           dialog.destroy
         end
       end
@@ -280,7 +281,18 @@ module Dumon
       end
 
       btn_apply = Gtk::Button.new(Gtk::Stock::APPLY)
+      # delete
       btn_delete = Gtk::Button.new(Gtk::Stock::DELETE)
+      btn_delete.signal_connect('clicked') do
+        selection = treeview.selection
+        if iter = selection.selected
+          prof_name = iter[0]
+          conf[:profiles].delete prof_name.to_sym
+          Dumon::App.instance.write_config(conf)
+          Dumon::logger.debug "Deleted profile, name=#{prof_name}"
+          dialog.destroy
+        end
+      end
 
       t.attach(treeview, 0, 1, 1, 2)
       t.attach(Gtk::VBox.new(false, 5).pack_start(btn_apply, false, false).pack_start(btn_delete, false, false), 1, 2, 1, 2)
