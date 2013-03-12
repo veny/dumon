@@ -14,6 +14,7 @@ module Rrutils
       unless input_stream.nil?
         begin
           rslt = JSON.load(input_stream)
+          Dumon::logger.debug "Configuration readed, keys=#{rslt.keys}"
         rescue => e
           Dumon::logger.warn "failed to read configuration: #{e.message}"
         ensure
@@ -21,15 +22,17 @@ module Rrutils
         end
       end
 
-      Dumon::logger.debug "Configuration keys: #{rslt.keys}"
       rslt
     end
 
     ###
     # Writes out the configuration to a given output stream.
     def write(conf, output_stream=STDOUT)
+      raise ArgumentError, 'configuration not a hash' unless conf.is_a? Hash
+
       begin
         output_stream.write(JSON.pretty_generate(conf))
+        Dumon::logger.debug "Configuration written, keys=#{conf.keys}"
       rescue => e
         Dumon::logger.error "failed to write configuration: #{e.message}"
       ensure

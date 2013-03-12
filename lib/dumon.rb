@@ -92,7 +92,7 @@ module Dumon
     # Writes Dumon's configuration.
     def write_config(conf)
       conf[:version] = VERSION
-      write(conf, config_file)
+      write(conf, config_file('w'))
     end
 
     ###
@@ -110,7 +110,6 @@ module Dumon
         end
       end
 
-      #read(config_file)
       ui.render
     end
 
@@ -138,6 +137,7 @@ trap('INT') do
   Dumon::logger.debug 'Ctrl+C captured'
   Dumon::App.instance.quit
 end
+
 
 # development mode
 if __FILE__ == $0
