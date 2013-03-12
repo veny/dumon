@@ -280,7 +280,21 @@ module Dumon
         iter.set_value 0, k.to_s
       end
 
+      # apply
       btn_apply = Gtk::Button.new(Gtk::Stock::APPLY)
+      btn_apply.signal_connect('clicked') do
+        selection = treeview.selection
+        if iter = selection.selected
+          prof_name = iter[0]
+          profile = conf[:profiles][prof_name.to_sym]
+          profile[:mode] = profile[:mode].to_sym
+          omanager.switch profile
+          dialog.destroy
+        end
+      end
+      treeview.signal_connect("row-activated") do
+        puts "XXXXXXXXXX"
+      end
       # delete
       btn_delete = Gtk::Button.new(Gtk::Stock::DELETE)
       btn_delete.signal_connect('clicked') do
