@@ -61,7 +61,7 @@ module Rrutils
     # verify_and_sanitize_options(options_to_be_verified, {:foo=>'defaultValue', :bar=>100})
     #
     def verify_and_sanitize_options(options, pattern, cloned=true)
-      opts = options.clone if cloned
+      opts = cloned ? options.clone : options
 
       verify_options(opts, pattern)
 
@@ -69,6 +69,20 @@ module Rrutils
       pattern.select { |k,v| !v.nil? and v != :optional }.each do |k,v|
         opts[k] = v if !opts.keys.include? k
       end
+      opts
+    end
+
+    ###
+    # Goes recursively through given Hash and converst all key into Symbol.
+    def keys_to_sym(options)
+      raise ArgumentError, 'not a hash' unless options.is_a? Hash
+      opts = options.clone
+
+      options.each do |k,v|
+        opts[k.to_sym] = opts.delete k unless k.is_a? Symbol
+        opts[k.to_sym] = keys_to_sym(v) if v.is_a? Hash
+      end
+
       opts
     end
 

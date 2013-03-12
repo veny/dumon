@@ -17,11 +17,11 @@ module Rrutils
         rescue => e
           Dumon::logger.warn "failed to read configuration: #{e.message}"
         ensure
-          input_stream.close
+          input_stream.close unless input_stream === STDIN
         end
       end
 
-      Dumon::logger.debug "Profiles: #{rslt.keys}"
+      Dumon::logger.debug "Configuration keys: #{rslt.keys}"
       rslt
     end
 
@@ -33,7 +33,7 @@ module Rrutils
       rescue => e
         Dumon::logger.error "failed to write configuration: #{e.message}"
       ensure
-        output_stream.close
+        output_stream.close unless output_stream === STDOUT
       end
     end
 

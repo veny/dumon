@@ -89,6 +89,7 @@ module Dumon
   ###
   # This class represents a user interface represented by system tray icon and its context menu.
   class GtkTrayUi < GtkUi
+    include Rrutils::Options
 
     def initialize #:nodoc:
       super
@@ -239,15 +240,49 @@ module Dumon
     ###
     # Function to open a dialog box for profile management.
     def profile_management_dialog
-      # create the dialog
-      dialog = Gtk::Dialog.new('Store profile', nil, Gtk::Dialog::MODAL,
-          [Gtk::Stock::OK, Gtk::Dialog::RESPONSE_OK], [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_REJECT])
+      conf = Dumon::App.instance.read(Dumon::App.instance.config_file)
+      conf = keys_to_sym conf
 
-      entry = Gtk::Entry.new
-      widget = Gtk::HBox.new(FALSE, 5)
-      widget.add(Gtk::Label.new('Name:'))
-      widget.add(entry)
-      dialog.vbox.add(widget)
+      # create the dialog
+      dialog = Gtk::Dialog.new('Profile management', nil, Gtk::Dialog::MODAL, [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_REJECT])
+      t = Gtk::Table.new(2, 2)
+      t.row_spacings = 5
+      t.column_spacings = 5
+
+      # save new profile
+      entry_store = Gtk::Entry.new
+      btn_save = Gtk::Button.new(Gtk::Stock::SAVE)
+      btn_save.signal_connect('clicked') do
+        if entry_store.text.size > 0
+          conf[:profiles][entry_store.text] = Dumon::App.instance.current_profile
+          Dumon::App.instance.write(conf)
+          dialog.destroy
+        end
+      end
+
+      t.attach(Gtk::HBox.new(false, 5).pack_start(Gtk::Label.new('Profile name:'), false, false).add(entry_store), 0, 1, 0, 1)
+      t.attach(btn_save, 1, 2, 0, 1)
+
+      # select/delete existing profile
+      model = Gtk::ListStore.new(String)
+      treeview = Gtk::TreeView.new(model)
+      treeview.headers_visible = false
+      renderer = Gtk::CellRendererText.new
+      column = Gtk::TreeViewColumn.new('', renderer, :text => 0)
+      treeview.append_column(column)
+
+      conf[:profiles].keys.each do |k|
+        iter = model.append
+        iter.set_value 0, k.to_s
+      end
+
+      btn_apply = Gtk::Button.new(Gtk::Stock::APPLY)
+      btn_delete = Gtk::Button.new(Gtk::Stock::DELETE)
+
+      t.attach(treeview, 0, 1, 1, 2)
+      t.attach(Gtk::VBox.new(false, 5).pack_start(btn_apply, false, false).pack_start(btn_delete, false, false), 1, 2, 1, 2)
+
+      dialog.vbox.add t
 
       # ensure that the dialog box is destroyed when the user responds
       dialog.signal_connect('response') do |w, code|
