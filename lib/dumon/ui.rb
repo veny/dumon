@@ -236,6 +236,15 @@ module Dumon
     end
 
     ###
+    # Applies a profile from configuration according selection in tree view.
+    def apply_profile(conf, iter)
+      prof_name = iter[0]
+      profile = conf[:profiles][prof_name.to_sym]
+      profile[:mode] = profile[:mode].to_sym
+      omanager.switch profile
+    end
+
+    ###
     # Function to open a dialog box for profile management.
     def profile_management_dialog
       conf = Dumon::App.instance.read_config
@@ -285,15 +294,16 @@ module Dumon
       btn_apply.signal_connect('clicked') do
         selection = treeview.selection
         if iter = selection.selected
-          prof_name = iter[0]
-          profile = conf[:profiles][prof_name.to_sym]
-          profile[:mode] = profile[:mode].to_sym
-          omanager.switch profile
+          apply_profile(conf, iter)
           dialog.destroy
         end
       end
-      treeview.signal_connect("row-activated") do
-        puts "XXXXXXXXXX"
+      # double-click on treeview
+      treeview.signal_connect("row-activated") do |view, path|
+        if iter = view.model.get_iter(path)
+          apply_profile(conf, iter)
+          dialog.destroy
+        end
       end
       # delete
       btn_delete = Gtk::Button.new(Gtk::Stock::DELETE)
