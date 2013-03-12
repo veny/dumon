@@ -92,7 +92,7 @@ module Dumon
     # Writes Dumon's configuration.
     def write_config(conf)
       conf[:version] = VERSION
-      write(conf)#, config_file)
+      write(conf, config_file)
     end
 
     ###
@@ -114,6 +114,13 @@ module Dumon
       ui.render
     end
 
+    ###
+    # Quits cleanly the application.
+    def quit
+      ui.quit
+      Dumon::logger.info 'Terminted...'
+    end
+
   end # App
 
 end
@@ -126,6 +133,11 @@ Dumon::logger.level = Logger::INFO
 Dumon::logger.info \
     "Dumon #{Dumon::VERSION}, running on Ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]"
 
+# Capturing Ctrl+C to cleanly quit
+trap('INT') do
+  Dumon::logger.debug 'Ctrl+C captured'
+  Dumon::App.instance.quit
+end
 
 # development mode
 if __FILE__ == $0

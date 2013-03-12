@@ -38,7 +38,7 @@ module Dumon
     ###
     # Quits the application.
     def quit
-      Dumon::logger.info "Terminted..."
+      raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
     ###
@@ -67,7 +67,6 @@ module Dumon
     end
 
     def quit #:nodoc:
-      super
       Gtk.main_quit
     end
 
@@ -230,7 +229,7 @@ module Dumon
       rslt.append(item)
       # Quit
       item = Gtk::ImageMenuItem.new(Gtk::Stock::QUIT)
-      item.signal_connect('activate') { self.quit }
+      item.signal_connect('activate') { Dumon::App.instance.quit }
       rslt.append(item)
 
       rslt
