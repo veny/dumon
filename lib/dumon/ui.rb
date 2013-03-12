@@ -241,6 +241,7 @@ module Dumon
       profile = conf[:profiles][prof_name.to_sym]
       profile[:mode] = profile[:mode].to_sym
       omanager.switch profile
+      Dumon::logger.debug "Profile applied, name=#{prof_name}"
     end
 
     ###
