@@ -89,7 +89,6 @@ module Dumon
   ###
   # This class represents a user interface represented by system tray icon and its context menu.
   class GtkTrayUi < GtkUi
-    include Rrutils::Options
 
     def initialize #:nodoc:
       super
@@ -240,8 +239,7 @@ module Dumon
     ###
     # Function to open a dialog box for profile management.
     def profile_management_dialog
-      conf = Dumon::App.instance.read(Dumon::App.instance.config_file)
-      conf = keys_to_sym conf
+      conf = Dumon::App.instance.read_config
 
       # create the dialog
       dialog = Gtk::Dialog.new('Profile management', nil, Gtk::Dialog::MODAL, [Gtk::Stock::CANCEL, Gtk::Dialog::RESPONSE_REJECT])
@@ -255,9 +253,15 @@ module Dumon
       btn_save.signal_connect('clicked') do
         if entry_store.text.size > 0
           conf[:profiles][entry_store.text] = Dumon::App.instance.current_profile
-          Dumon::App.instance.write(conf)
+          Dumon::App.instance.write_config(conf)
           dialog.destroy
         end
+      end
+      # disable entry/button if no mode set (probably after start of Dumon)
+      if Dumon::App.instance.current_profile.nil?
+        entry_store.text = '<make a choice first>'
+        entry_store.set_sensitive false
+        btn_save.set_sensitive false
       end
 
       t.attach(Gtk::HBox.new(false, 5).pack_start(Gtk::Label.new('Profile name:'), false, false).add(entry_store), 0, 1, 0, 1)

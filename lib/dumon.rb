@@ -28,6 +28,7 @@ module Dumon
   class App
     include ::Singleton
     include Rrutils::Confdb
+    include Rrutils::Options
 
     ###
     # User interface of Dumon tool.
@@ -74,6 +75,24 @@ module Dumon
       File.open(filename, 'w').close unless File.exist? filename
 
       File.open(filename, mode)
+    end
+
+    ###
+    # Reads Dumon's configuration.
+    def read_config
+      conf = read config_file
+      conf = keys_to_sym conf
+
+      # there can be a hook if config version is old
+
+      conf
+    end
+
+    ###
+    # Writes Dumon's configuration.
+    def write_config(conf)
+      conf[:version] = VERSION
+      write(conf)#, config_file)
     end
 
     ###
