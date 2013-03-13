@@ -2,6 +2,7 @@ module Dumon
 
   # Version history.
   VERSION_HISTORY = [
+    ['0.2.1',   '2013-03-13', 'BF #9: Crash Ruby 1.8.7 because of Dir.home'],
     ['0.2.0',   '2013-03-12', 'Enh #5: Profiles; File based configuration'],
     ['0.1.7',   '2013-02-13', 'Enh #4: About dialog'],
     ['0.1.6',   '2013-02-11', 'BF #3: Crash by rendering popup menu if only one output is there'],

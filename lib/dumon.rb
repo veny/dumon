@@ -65,7 +65,8 @@ module Dumon
     ###
     # Gets default config file.
     def config_file(mode='r')
-      filename = "#{Dir.home}#{File::SEPARATOR}.config#{File::SEPARATOR}dumon.conf"
+      homedir = RUBY_VERSION < '1.9' ? ENV['HOME'] : Dir.home
+      filename = "#{homedir}#{File::SEPARATOR}.config#{File::SEPARATOR}dumon.conf"
 
       # check and create directory structure
       dirname = File.dirname filename
