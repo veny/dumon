@@ -201,15 +201,26 @@ module Dumon
         o1 = outputs.keys[1]
         item = Gtk::MenuItem.new("#{o0} left of #{o1}")
         item.signal_connect('activate') do
-          omanager.switch({:mode=>:sequence, :outs=>[o0, o1], :resolutions=>[@selected_resolution[o0], @selected_resolution[o1]], :primary=>@primary_output})
+          omanager.switch({:mode=>:hsequence, :outs=>[o0, o1], :resolutions=>[@selected_resolution[o0], @selected_resolution[o1]], :primary=>@primary_output})
           # clear preferred resolution, by next rendering will be read from real state
           @selected_resolution.clear
         end
         rslt.append(item)
         item = Gtk::MenuItem.new("#{o1} left of #{o0}")
         item.signal_connect('activate') do
-          omanager.switch({:mode=>:sequence, :outs=>[o1, o0], :resolutions=>[@selected_resolution[o1], @selected_resolution[o0]], :primary=>@primary_output})
-          # clear preferred resolution, by next rendering will be read from real state
+          omanager.switch({:mode=>:hsequence, :outs=>[o1, o0], :resolutions=>[@selected_resolution[o1], @selected_resolution[o0]], :primary=>@primary_output})
+          @selected_resolution.clear
+        end
+        rslt.append(item)
+        item = Gtk::MenuItem.new("#{o0} above #{o1}")
+        item.signal_connect('activate') do
+          omanager.switch({:mode=>:vsequence, :outs=>[o0, o1], :resolutions=>[@selected_resolution[o0], @selected_resolution[o1]], :primary=>@primary_output})
+          @selected_resolution.clear
+        end
+        rslt.append(item)
+        item = Gtk::MenuItem.new("#{o1} above #{o0}")
+        item.signal_connect('activate') do
+          omanager.switch({:mode=>:vsequence, :outs=>[o1, o0], :resolutions=>[@selected_resolution[o1], @selected_resolution[o0]], :primary=>@primary_output})
           @selected_resolution.clear
         end
         rslt.append(item)

@@ -31,11 +31,11 @@ module Dumon
     # Mirrored outputs:
     # {:mode=>:mirror, :resolution=>'1600x900'}
     # Sequence of outputs:
-    # {:mode=>:sequence, :outs=>['VGA1', 'LVDS1'], :resolutions=>['1920x1080', '1600x900'], :primary=>:none}
+    # {:mode=>:hsequence, :outs=>['VGA1', 'LVDS1'], :resolutions=>['1920x1080', '1600x900'], :primary=>:none}
     def switch(options)
       # pre-conditions
       verify_options(options, {
-        :mode => [:single, :mirror, :sequence],
+        :mode => [:single, :mirror, :hsequence, :vsequence],
         :out => :optional, :outs => :optional,
         :resolution => :optional, :resolutions => :optional,
         :primary => :optional
@@ -60,14 +60,14 @@ module Dumon
           assert(v[:resolutions].include?(options[:resolution]), "unknown resolution: #{options[:resolution]}, output: #{k}")
         end
         mirror(options[:resolution])
-      when :sequence
-        verify_options(options, {:mode => [:sequence], :outs => :mandatory, :resolutions => :mandatory, :primary => :optional})
+      when :hsequence, :vsequence
+        verify_options(options, {:mode => [:hsequence, :vsequence], :outs => :mandatory, :resolutions => :mandatory, :primary => :optional})
         assert(options[:outs].is_a?(Array), 'parameter :outs has to be Array')
         assert(options[:resolutions].is_a?(Array), 'parameter :resolutions has to be Array')
         assert(options[:outs].size == options[:resolutions].size, 'size of :outs and :resolutions does not match')
         assert(options[:outs].size > 1, 'sequence mode expects at least 2 outputs')
         assert(outputs.keys.include?(options[:primary]), "unknown primary output: #{options[:primary]}") unless options[:primary].nil?
-        sequence(options[:outs], options[:resolutions], options[:primary])
+        sequence(options[:outs], options[:resolutions], options[:primary], :hsequence === options[:mode])
       end
 
       Dumon::App.instance.current_profile = options
@@ -130,7 +130,8 @@ module Dumon
     # *param* outs in form ['VGA1', 'LVDS1']
     # *resolutions* in form ['1920x1080', '1600x900']
     # *param* primary name of primary output
-    def sequence(outs, resolutions, primary=:none)
+    # *param* horizontal whether horizontal linie of outputs
+    def sequence(outs, resolutions, primary=:none, horizontal=true)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
     end
 
@@ -224,7 +225,7 @@ module Dumon
       `#{cmd}`
     end
 
-    def sequence(outs, resolutions, primary=:none) #:nodoc:
+    def sequence(outs, resolutions, primary=:none, horizontal=true) #:nodoc:
       cmd = "#{self.stool}"
       for i in 0..outs.size - 1
         output = outs[i]
@@ -232,7 +233,11 @@ module Dumon
         resolution = self.default_resolution(output) if resolution.nil?
         cmd << " --output #{output} --mode #{resolution}"
         cmd << ' --primary' if primary.to_s == output
-        cmd << " --right-of #{outs[i - 1]}" if i > 0
+        if horizontal
+          cmd << " --right-of #{outs[i - 1]}" if i > 0
+        else
+          cmd << " --below #{outs[i - 1]}" if i > 0
+        end
       end
 
       Dumon::logger.debug "Command: #{cmd}"
