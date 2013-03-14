@@ -70,7 +70,7 @@ module Dumon
 
       # check and create directory structure
       dirname = File.dirname filename
-      ::FileUtils.mkdir_p(dirname) unless Dir.exist?(dirname)
+      ::FileUtils.mkdir_p(dirname) unless File.exist?(dirname)
 
       # create file if does not exist
       File.open(filename, 'w').close unless File.exist? filename
