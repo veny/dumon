@@ -66,7 +66,9 @@ module Dumon
         assert(options[:resolutions].is_a?(Array), 'parameter :resolutions has to be Array')
         assert(options[:outs].size == options[:resolutions].size, 'size of :outs and :resolutions does not match')
         assert(options[:outs].size > 1, 'sequence mode expects at least 2 outputs')
-        assert(outputs.keys.include?(options[:primary]), "unknown primary output: #{options[:primary]}") unless options[:primary].nil?
+        if !options[:primary].nil? and options[:primary].to_sym != :none
+          assert(outputs.keys.include?(options[:primary]), "unknown primary output: #{options[:primary]}")
+        end
         sequence(options[:outs], options[:resolutions], options[:primary], :hsequence === options[:mode])
       end
 
