@@ -86,6 +86,7 @@ module Dumon
 
       # there can be a hook if config version is old
 
+      conf = verify_and_sanitize_options conf, {:version => VERSION, :profiles => {}}
       conf
     end
 
