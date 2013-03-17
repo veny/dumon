@@ -43,10 +43,6 @@ module Dumon
     def initialize
       @ui = new_ui
       Dumon::logger.debug "Used UI: #{ui.class.name}"
-
-      # storage of preferred resolution for next rendering (will be cleared by output changing)
-      # {"LVDS1" => "1600x900", "VGA1" => "800x600"}
-      @selected_resolution = {}
     end
 
     ###
