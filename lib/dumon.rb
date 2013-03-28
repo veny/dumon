@@ -141,14 +141,35 @@ Dumon::logger.level = Logger::INFO
 Dumon::logger.info \
     "Dumon #{Dumon::VERSION}, running on Ruby #{RUBY_VERSION} (#{RUBY_RELEASE_DATE}) [#{RUBY_PLATFORM}]"
 
+
 # Capturing Ctrl+C to cleanly quit
-trap('INT') do
+Signal.trap('INT') do
   Dumon::logger.debug 'Ctrl+C captured'
   Dumon::App.instance.quit
 end
+# Capturing user signal to reset output settings
+Signal.trap('SIGUSR1') do
+  Dumon::App.instance.ui.omanager.reset
+end
 
 
-# development mode
+# Sending a signal to existing Dumon's instance to reset output to a default device
+# (first output with native resolution).
+if ARGV.include?('--reset')
+  ps = `ps ax | grep -i 'ruby.*dumon' | grep -v #{Process.pid} | grep -v grep`
+  if ps.nil? or ps.empty?
+    Dumon::logger.warn "No running Dumon instance found"
+  else
+    pid = ps.split[0].to_i
+    `kill -s SIGUSR1 #{pid}`
+    Dumon::logger.info "Signal SIGUSR1 sent to already running Dumon instance, pid=#{pid}"
+  end
+  exit
+end
+
+
+##################
+# DEVELOPMENT MODE
 if __FILE__ == $0
   Dumon::logger.level = Logger::DEBUG
   Dumon::App.instance.run(ARGV.include? '--daemon')

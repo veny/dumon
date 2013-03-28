@@ -76,6 +76,15 @@ module Dumon
     end
 
     ###
+    # Resets output to the first one delivered by the underlaying system tool
+    # and switches to its default resolution.
+    def reset
+      assert(!outputs.nil?, 'no outputs found')
+      out = outputs.keys.first
+      switch :mode => :single, :out => out, :resolution => default_resolution(out)
+    end
+
+    ###
     # Reads info about current accessible output devices and their settings.
     # Readed infos will be stored and accessible via reader 'outputs'.
     def read

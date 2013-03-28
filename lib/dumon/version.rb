@@ -2,6 +2,7 @@ module Dumon
 
   # Version history.
   VERSION_HISTORY = [
+    ['0.2.4',   '2013-03-29', 'New CLI argument: --reset, tested with MRI Ruby 2.0.0'],
     ['0.2.3',   '2013-03-17', 'BF #10: Profile dialog fails unless configuration exists'],
     ['0.2.2',   '2013-03-15', 'Enh #6: Vertical location of outputs'],
     ['0.2.1',   '2013-03-13', 'BF #9: Crash Ruby 1.8.7 because of Dir.home'],
