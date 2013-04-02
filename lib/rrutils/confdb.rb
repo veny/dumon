@@ -13,7 +13,8 @@ module Rrutils
       rslt = {}
       unless input_stream.nil?
         begin
-          rslt = JSON.load(input_stream)
+          rslt = JSON.load(input_stream) # returns 'nil' if empty file
+          rslt ||= {}
           Dumon::logger.debug "Configuration readed, keys=#{rslt.keys}"
         rescue => e
           Dumon::logger.warn "failed to read configuration: #{e.message}"
