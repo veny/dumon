@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new('> 1.3.1') if s.respond_to? :required_rubygems_version=
   s.authors = ['Vaclav Sykora']
   s.date = Dumon::VERSION_HISTORY[0][1]
-  s.description = %q{Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon and its context menu.}
+  s.description = %q{Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon's context menu.}
   s.email = %q{vaclav.sykora@gmail.com}
 
   s.files         = `git ls-files`.split("\n").select { |item| item unless item.start_with? 'screenshot' }

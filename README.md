@@ -5,7 +5,7 @@
           |____/ \__,_|_| |_| |_|\___/|_| |_|
 
 
-Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon and its context menu.
+Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon's context menu.
 
 ## SCREENSHOTS
 
@@ -63,6 +63,8 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 ## FEATURES/PROBLEMS
 
 * only for Linux
+* dynamical detection of currently connected output devices
+* support for storing profiles
 * currently supports only two output devices
 * currently works only with 'xrandr' (command line interface to RandR extension)
 
