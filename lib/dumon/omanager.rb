@@ -193,14 +193,18 @@ module Dumon
           rslt[output][:resolutions] << resolution
         end
       end
+      # BF 13 not all outputs provide default resolution
+      rslt.each do |output,out_meta|
+        # consider the first resolution (the highest) as default
+        out_meta[:default] = out_meta[:resolutions].first unless out_meta.include? :default
+      end
       Dumon::logger.debug "Outputs found: #{rslt}"
 
       # verify structure of readed infos
       assert(!rslt.empty?, 'no outputs found')
-      rslt.keys.each do |k|
-        out_meta = rslt[k]
+      rslt.each do |output,out_meta|
         verify_options(out_meta, {:resolutions=>:mandatory, :default=>:mandatory, :current=>:optional})
-        assert(out_meta[:resolutions].size > 1, "no resolution found, output=#{k}")
+        assert(out_meta[:resolutions].size > 1, "no resolution found, output=#{output}")
       end
 
       @outputs = rslt

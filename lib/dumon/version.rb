@@ -2,6 +2,7 @@ module Dumon
 
   # Version history.
   VERSION_HISTORY = [
+    ['0.2.6',   '2013-04-23', 'BF #13, Failure if no default resolution provided by output'],
     ['0.2.5',   '2013-04-02', 'BF #12, Profile dialog fails if configuration is empty'],
     ['0.2.4',   '2013-03-29', 'New CLI argument: --reset, tested with MRI Ruby 2.0.0'],
     ['0.2.3',   '2013-03-17', 'BF #10: Profile dialog fails unless configuration exists'],
