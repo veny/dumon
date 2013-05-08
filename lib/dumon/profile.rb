@@ -19,12 +19,24 @@ module Dumon
     end
 
     ###
+    # Reacts to an problem by profile use with a warning.
+    # *msg* message describing the problem
+    def on_warn(msg)
+      Dumon::logger.warn msg.join(', ')
+    end
+
+    ###
     # Applies a profile from configuration according selection in tree view.
+    # *prof_name* profile name
     def apply_profile(prof_name)
       profile = @dumon_conf[:profiles][prof_name.to_sym]
       profile[:mode] = profile[:mode].to_sym
-      Dumon::App.instance.ui.omanager.switch profile
-      Dumon::logger.debug "Profile applied, name=#{prof_name}"
+      begin
+        Dumon::App.instance.ui.omanager.switch profile
+        Dumon::logger.debug "Profile applied, name=#{prof_name}"
+      rescue ArgumentError => ae # BF #14
+        on_warn ['Profile use failed! (unconnected output?)', "profile name=#{prof_name}", "message=#{ae.message}"]
+      end
     end
 
   end
@@ -126,6 +138,17 @@ module Dumon
 
     def show #:nodoc:
       @dialog.show_all
+    end
+
+    def on_warn(msg) #:nodoc:
+      super(msg)
+      md = Gtk::MessageDialog.new(
+          @dialog,
+          Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::WARNING,
+          Gtk::MessageDialog::BUTTONS_CLOSE,
+          msg.join("\n"))
+      md.run
+      md.destroy
     end
 
   end

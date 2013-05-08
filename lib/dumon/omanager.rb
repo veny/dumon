@@ -124,7 +124,7 @@ module Dumon
 
     ###
     # Switch to given single output device with given resolution.
-    # *param* output
+    # *output* output
     # *resolution* nil for default resolution
     def single(output, resolution=nil)
       raise NotImplementedError, 'this should be overridden by concrete sub-class'
