@@ -180,13 +180,14 @@ module Dumon
       rslt = {}
 
       output = nil
+
       xrandr_out = `#{self.stool} -q`
       xrandr_out.each_line do |line|
-        if line =~ /^\w+ connected /
-          output = line[/^\w+/]
+        if line =~ /^[\w-]+ connected /
+          output = line[/^[\w-]+/]
           rslt[output] = {:resolutions => []}
         end
-        if line =~ /^\s+[0-9x]+\s+\d+/ and not output.nil?
+        if line =~ /^\s*[0-9x]+\s+\d+/ and not output.nil?
           resolution = line[/[0-9x]+/]
           rslt[output][:default] = resolution if line.include? '+'
           rslt[output][:current] = resolution if line.include? '*'
@@ -204,7 +205,7 @@ module Dumon
       assert(!rslt.empty?, 'no outputs found')
       rslt.each do |output,out_meta|
         verify_options(out_meta, {:resolutions=>:mandatory, :default=>:mandatory, :current=>:optional})
-        assert(out_meta[:resolutions].size > 1, "no resolution found, output=#{output}")
+        assert(out_meta[:resolutions].size >= 1, "no resolution found, output=#{output}")
       end
 
       @outputs = rslt
