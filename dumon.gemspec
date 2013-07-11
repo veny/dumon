@@ -23,6 +23,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ['--charset=UTF-8']
   s.rubygems_version = %q{1.3.7}
   s.summary = %q{Dual monitor manager for Linux.}
+  s.license = 'Apache License, v2.0'
 
   s.add_dependency(%q<gtk2>, ["~> 1.2.0"])
 #  s.add_development_dependency(%q<json>, ["~> 1.5.1"])
