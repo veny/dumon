@@ -73,6 +73,13 @@ module Dumon
       end
 
       Dumon::App.instance.current_profile = options
+
+      # post switch action
+      dumon_conf = Dumon::App.instance.read_config
+      if dumon_conf.include? :post_switch
+        job = fork { exec dumon_conf[:post_switch] }
+        Process.detach(job)
+      end
     end
 
     ###

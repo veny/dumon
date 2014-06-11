@@ -5,7 +5,7 @@
           |____/ \__,_|_| |_| |_|\___/|_| |_|
 
 
-Dual monitor manager for Linux with GTK2 based user interface represented by system tray icon's context menu.
+Dual monitor manager for Linux with GTK based user interface represented by system tray icon's context menu.
 
 ## SCREENSHOTS
 
@@ -16,6 +16,16 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 [![](https://raw.github.com/veny/dumon/master/screenshots/resolution_menu.png)](https://raw.github.com/veny/dumon/master/screenshots/resolution_menu.png)
 
 [![](https://raw.github.com/veny/dumon/master/screenshots/mirror_menu.png)](https://raw.github.com/veny/dumon/master/screenshots/mirror_menu.png)
+
+
+## FEATURES/PROBLEMS
+
+* only for Linux
+* dynamical detection of currently connected output devices
+* support for storing profiles
+* configurable shell command running after each switch of output
+* currently supports only two output devices
+* currently works only with 'xrandr' (command line interface to RandR extension)
 
 
 ## USAGE
@@ -59,16 +69,20 @@ Dual monitor manager for Linux with GTK2 based user interface represented by sys
 
  > Dumon.logger.level = Logger::DEBUG
 
+ #### Post Switch Command
 
-## FEATURES/PROBLEMS
+ * you can define a shell command that will be executed after each switch of output
+ * just insert _post_switch_ key into _$HOME/.config/dumon.conf_ like this
 
-* only for Linux
-* dynamical detection of currently connected output devices
-* support for storing profiles
-* currently supports only two output devices
-* currently works only with 'xrandr' (command line interface to RandR extension)
+ ```
+{
+  "version": "0.2.8",
+  "post_switch": "feh --bg-scale /usr/share/archlinux/wallpaper/archlinux-firestarter.jpg; killall conky; conky"
+}
+```
 
-## REQUIREMENTS
+
+ ## REQUIREMENTS
 
 * Ruby 1.8.7 +
 * ruby-gtk2 1.2.x +
