@@ -69,7 +69,7 @@ Dual monitor manager for Linux with GTK based user interface represented by syst
 
  > Dumon.logger.level = Logger::DEBUG
 
- #### Post Switch Command
+#### Post Switch Command
 
  * you can define a shell command that will be executed after each switch of output
  * just insert _post_switch_ key into _$HOME/.config/dumon.conf_ like this
