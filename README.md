@@ -7,6 +7,8 @@
 
 Dual monitor manager for Linux with GTK based user interface represented by system tray icon's context menu.
 
+[![Gem Version](https://badge.fury.io/rb/dumon.svg)](http://badge.fury.io/rb/dumon)
+
 ## SCREENSHOTS
 
 [![](https://raw.github.com/veny/dumon/master/screenshots/tray_icon.png)](https://raw.github.com/veny/dumon/master/screenshots/tray_icon.png)

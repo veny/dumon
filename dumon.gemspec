@@ -25,5 +25,5 @@ Gem::Specification.new do |s|
   s.summary = %q{Dual monitor manager for Linux.}
   s.license = 'Apache License, v2.0'
 
-  s.add_runtime_dependency 'gtk2', '~> 1.2', '>= 1.2.0'
+  s.add_runtime_dependency 'gtk2', '~> 2.2', '>= 2.2.0'
 end

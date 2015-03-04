@@ -2,6 +2,7 @@ module Dumon
 
   # Version history.
   VERSION_HISTORY = [
+    ['0.3.0',   '2015-03-04', 'Upgrade to Gtk v2.2+, BF #19'],
     ['0.2.9',   '2014-06-11', 'Added configurable shell command running after each switch of output'],
     ['0.2.8',   '2013-07-10', 'BF #15: Problem with nvidia graphic driver'],
     ['0.2.7',   '2013-05-08', 'BF #14: Failure if applied profile with unconnected output; Enh #7'],

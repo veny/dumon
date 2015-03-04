@@ -189,6 +189,7 @@ module Dumon
       output = nil
 
       xrandr_out = `#{self.stool} -q`
+      xrandr_out.strip!
       xrandr_out.each_line do |line|
         if line =~ /^[\w-]+ connected /
           output = line[/^[\w-]+/]
@@ -209,7 +210,6 @@ module Dumon
       Dumon::logger.debug "Outputs found: #{rslt}"
 
       # verify structure of readed infos
-      assert(!rslt.empty?, 'no outputs found')
       rslt.each do |output,out_meta|
         verify_options(out_meta, {:resolutions=>:mandatory, :default=>:mandatory, :current=>:optional})
         assert(out_meta[:resolutions].size >= 1, "no resolution found, output=#{output}")

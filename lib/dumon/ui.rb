@@ -117,7 +117,19 @@ module Dumon
     ###
     # Reads info about currently usable outputs and construct corresponding structure of context menu.
     def create_menu
-      outputs = self.omanager.read
+      begin
+        outputs = self.omanager.read
+        if outputs.empty?
+          md = Gtk::MessageDialog.new(nil,
+            Gtk::Dialog::DESTROY_WITH_PARENT, Gtk::MessageDialog::WARNING, Gtk::MessageDialog::BUTTONS_YES_NO,
+            "Failed to load display information.\nDo you want to reload?\n(Hit 'no' to terminate application)")
+          md.set_window_position :mouse
+          md.run do |r|
+            raise 'failed to load display information' if r == Gtk::Dialog::RESPONSE_NO
+          end
+          md.destroy
+        end
+      end while outputs.empty?
 
       rslt = Gtk::Menu.new
 
